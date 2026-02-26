@@ -92,10 +92,12 @@ code: |
   set_parts(subtitle=str(users))
   A_Divorce_Agreement
   has_no_children
-  custody_custom_terms
-  child_support_wage_assignment
-  set_progress(14)
-  education_cost_based_on_ability
+  if has_no_children: 
+    children.gather()
+    custody_custom_terms
+    child_support_wage_assignment
+    education_cost_based_on_ability
+  set_progress(14)  
   health_insurance_self_responsible
   alimony_waived_all
   taxes_file_separately
@@ -108,7 +110,6 @@ code: |
   users1_initials
   set_progress(42)
   trial_court.division
-  children.gather()
   other_parties[0].address.address
   other_parties.gather()
   set_progress(56)
@@ -172,8 +173,13 @@ fields:
     datatype: yesno
   - "Do you and your spouse have any unemancipated  children together?": has_children
     datatype: yesno
-  - "What is your child's first name?": child.name.first
-  - "What is your child’s date of birth?": child.birthdate
+---
+id: child info 
+question: | 
+    Tell us about your child(ren)
+fields: 
+  - "What is your child's first name?": children[i].name.first
+  - "What is your child’s date of birth?": children[i].birthdate
     datatype: date
 ---
 id: Child Custody and Parenting Time
