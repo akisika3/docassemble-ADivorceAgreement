@@ -115,9 +115,39 @@ code: |
     
   
   taxes_file_separately
-  no_real_estate
+  no_real_estate 
+  if not no_real_estate:
+    real_estate_transfer
+
+    if real_estate_transfer:
+        real_estate_owner_name
+        real_estate_waiver_party
+        real_estate_cost_responsible
+        real_estate_start_date
+
+    real_estate_address
+    real_estate_current_owner
+    real_estate_county
+    real_estate_book
+    real_estate_page
+
+    real_estate_custom_terms
+    if real_estate_custom_terms:
+        real_estate_custom_description
+
   set_progress(28)
   no_marital_debt
+  if no_marital_debt: 
+    marital_debt_custom_terms
+    if marital_debt_custom_terms: 
+      marital_debt_custom_description
+  
+  individual_debt_responsible_each
+  if not individual_debt_responsible_each: 
+    users[0].debt_listed
+    other_parties[0].debt_listed
+    
+    
   no_retirement_benefits
   no_life_insurance
   agreement_merge_fully
@@ -459,7 +489,7 @@ fields:
   - "Describe your agreement about college or trade school expenses:": education_custom_description
     show if: 
       variable: education_custom_terms
-      is: Yes
+      is: True
 ---
 ---
 id: Alimony
@@ -600,26 +630,41 @@ id: Marital Property
 question: |
   Marital Property
 fields:
+
   - "We do not own any real estate, either together or separately": no_real_estate
     datatype: yesno
+
   - "Have you and your spouse agreed that one of you will keep a piece of real estate as part of the divorce?": real_estate_transfer
     datatype: yesno
     show if:
       variable: no_real_estate
-      is: True 
+      is: True
+
   - "Who will keep the real estate property?": real_estate_owner_name
     input type: dropdown
     choices:
       - N/A
       - Party A
       - Party B
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "What is the full address of the real estate property involved in your agreement?": real_estate_address
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "Whose name is currently on the deed for the real estate property?": real_estate_current_owner
     input type: dropdown
     choices:
       - Party A
       - Party B
       - N/A
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "What county is the real estate property located in?": real_estate_county
     input type: dropdown
     choices:
@@ -628,47 +673,128 @@ fields:
       - Essex
       - Middlesex
       - Suffolk
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "What is the book number where the deed for the real estate is recorded?": real_estate_book
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "What is the page number in the Registry of Deeds where the real estate is recorded?": real_estate_page
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "Is a party waiving interest in the property?": real_estate_waiver_party
     input type: dropdown
     choices:
       - No
       - Party A
       - Party B
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "Who will be responsible for paying the costs and expenses for the real estate?": real_estate_cost_responsible
     input type: dropdown
     choices:
       - Party A
       - Party B
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "When will the person taking over the property start being responsible for its costs?": real_estate_start_date
     datatype: date
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "Do you have custom terms for real estate?": real_estate_custom_terms
     datatype: yesno
+    show if:
+      variable: no_real_estate
+      is: False
+
   - "Real estate custom description": real_estate_custom_description
+    show if:
+      variable: real_estate_custom_terms
+      is: True
+---
+id: Personal Property
+question: | 
+  Personal Property
+fields: 
   - "Personal property already divided": personal_property_already_divided
+    datatype: yesno
+
   - "Do you and your spouse have a plan for how to divide your personal property?": personal_property_divide_plan
+    datatype: yesno
+    show if: 
+      variable: personal_property_already_divided
+      is: False 
+
   - "Date of Personal property divide": personal_property_divide_date
     datatype: date
-  - "What special terms have you and your spouse agreed to about real estate?": personal_property_divide_description
+    show if: 
+      variable: personal_property_divide_plan
+      is: True
+
+  - "We have a plan property division": personal_property_divide_description
+    datatype: yesno
 ---
 id: Debts and Liabilities
 question: |
   Debts and Liabilities
 fields:
-  - "Do you and your spouse agree that you have no shared debts from the marriage?": no_marital_debt
-    datatype: yesno
-  - "Will each of you be responsible for paying the debts that are in your own name?": individual_debt_responsible_each
-    datatype: yesno
-  - "Does Party A have any debts or liabilities they will be responsible for?": users[0].debt_listed
-    datatype: yesno
-  - "What debts and liabilities will Party A be responsible for?": users[0].debt_description
-  - "Does Party B have any debts or liabilities?": other_parties[0].debt_listed
-    datatype: yesno
-  - "If Party B has debts and liabilities, what are they?": other_parties[0].debt_description
-  - "Do you have custom terms for debt?": debt_custom_terms
-    datatype: yesno
+  - "Do you have shared debts or liabilities from the marriage?": no_marital_debt
+    input type: dropdown
+    choices: 
+      - Yes
+      - No 
+  - "Do you agree on how to pay shared debts and liabilities?": debt_custom_terms
+    input type: dropdown
+    choices: 
+      - Yes
+      - No
+    show if: 
+      variable: no_marital_debt
+      is: Yes
   - "What is your agreement for debts and liabilities?": debt_custom_description
+    show if: 
+      variable: debt_custom_terms
+      is: Yes
+  - "We will each pay debts in our own name": individual_debt_responsible_each
+    input type: dropdown
+    choices: 
+      - Yes
+      - No
+  - "Does Party A have debts or liabilities?": users[0].debt_listed
+    input type: dropdown
+    choices:
+      - Yes
+      - No   
+    show if: 
+      variable: individual_debt_responsible_each
+      is: No
+  - "What debts and liabilities will Party A be responsible for?": users[0].debt_description
+    show if: 
+      variable: users[0].debt_listed
+      is: Yes 
+  - "Does Party B have debts or liabilities?": other_parties[0].debt_listed
+    input type: dropdown
+    choices: 
+      - Yes
+      - No
+    show if:
+      variable: individual_debt_responsible_each
+      is: No
+  - "If Party B has debts and liabilities, what are they?": other_parties[0].debt_description
+    show if: 
+      variable: other_parties[0].debt_listed
+      is: Yes
 ---
 id: Pension and Retirement Plans
 question: |
