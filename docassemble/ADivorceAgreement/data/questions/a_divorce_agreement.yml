@@ -96,7 +96,7 @@ code: |
     children.gather()
     custody_custom_terms
     parenting_time_assigned
-    child_support_wage_assignment
+    health_insurance_provided_for_children
     education_cost_based_on_ability
   set_progress(14)  
   health_insurance_self_responsible
@@ -231,137 +231,172 @@ fields:
       - Party A
       - Party B
 ---
-id: child_support
-show if: has_children
-question: |
-  Child Support
-subquestion: |
-  Child support is money one parent pays to help with a child's financial needs when the parents don't live together.
+# id: child_support
+# show if: has_children
+# question: |
+#   Child Support
+# subquestion: |
+#   Child support is money one parent pays to help with a child's financial needs when the parents don't live together.
 
-  **Calculate child support before answering.** You should complete the Child Support Guidelines worksheet before answering the questions below. The 2025 Child Support Guidelines and forms are effective December 1, 2025. In addition, you can find a worksheet for calculating child support, and a chart of per child calculations based on income.
+#   **Calculate child support before answering.** You should complete the Child Support Guidelines worksheet before answering the questions below. The 2025 Child Support Guidelines and forms are effective December 1, 2025. In addition, you can find a worksheet for calculating child support, and a chart of per child calculations based on income.
 
-  <a href="https://www.mass.gov/info-details/probate-and-family-court-2025-child-support-guidelines-worksheet-cjd-304" target="_blank" rel="noopener">Probate and Family Court 2025 Child Support Guidelines Worksheet (CJD 304)</a> (effective December 1, 2025)
+#   <a href="https://www.mass.gov/info-details/probate-and-family-court-2025-child-support-guidelines-worksheet-cjd-304" target="_blank" rel="noopener">Probate and Family Court 2025 Child Support Guidelines Worksheet (CJD 304)</a> (effective December 1, 2025)
 
-  Source: <a href="https://www.mass.gov/info-details/child-support-guidelines" target="_blank" rel="noopener">Child Support Guidelines | Mass.gov</a>
+#   Source: <a href="https://www.mass.gov/info-details/child-support-guidelines" target="_blank" rel="noopener">Child Support Guidelines | Mass.gov</a>
 
-  Answer the questions below about how child support will be handled in your agreement.
-fields:
-  - label: Who will make child support payments?
-    field: child_support_payer
-    input type: dropdown
-    choices:
-      - Party A
-      - Party B
+#   Answer the questions below about how child support will be handled in your agreement.
+# fields:
+#   - label: Who will make child support payments?
+#     field: child_support_payer
+#     input type: dropdown
+#     choices:
+#       - Party A
+#       - Party B
 
-  - label: Will child support be paid through a wage assignment handled by the Department of Revenue?
-    field: child_support_wage_assignment
-    datatype: yesnoradio
+#   - label: Will child support be paid through a wage assignment handled by the Department of Revenue?
+#     field: child_support_wage_assignment
+#     datatype: yesnoradio
 
-  - label: If the full child support amount is not paid through wage assignment, who will make up the difference?
-    field: child_support_shortfall_payer
-    input type: dropdown
-    choices:
-      - Party A
-      - Party B
-      - Other
-    show if: child_support_wage_assignment
+#   - label: If the full child support amount is not paid through wage assignment, who will make up the difference?
+#     field: child_support_shortfall_payer
+#     input type: dropdown
+#     choices:
+#       - Party A
+#       - Party B
+#       - Other
+#     show if: child_support_wage_assignment
 
-  - label: Will child support be paid directly (not through wage assignment)?
-    field: child_support_direct_payment
-    datatype: yesnoradio
-    show if: not child_support_wage_assignment
+#   - label: Will child support be paid directly (not through wage assignment)?
+#     field: child_support_direct_payment
+#     datatype: yesnoradio
+#     show if: not child_support_wage_assignment
 
-  - label: Who will receive the child support payments?
-    field: child_support_recipient
-    input type: dropdown
-    choices:
-      - Party A
-      - Party B
+#   - label: Who will receive the child support payments?
+#     field: child_support_recipient
+#     input type: dropdown
+#     choices:
+#       - Party A
+#       - Party B
 
-  - label: What is the weekly child support amount calculated by the Massachusetts Child Support Guidelines?
-    field: child_support_guideline_amount
-    datatype: currency
-    min: 0
-    default: 0
+#   - label: What is the weekly child support amount calculated by the Massachusetts Child Support Guidelines?
+#     field: child_support_guideline_amount
+#     datatype: currency
+#     min: 0
+#     default: 0
 
-  - label: Are you and your spouse choosing a different child support amount than the state's suggested amount?
-    field: child_support_deviation
-    datatype: yesnoradio
-  - label: Why are you agreeing to a different child support amount?
-    field: child_support_deviation_reason
-    show if: child_support_deviation
+#   - label: Are you and your spouse choosing a different child support amount than the state's suggested amount?
+#     field: child_support_deviation
+#     datatype: yesnoradio
+#   - label: Why are you agreeing to a different child support amount?
+#     field: child_support_deviation_reason
+#     show if: child_support_deviation
 
-  - label: How much will be paid for child support?
-    field: child_support_amount_value
-    datatype: currency
-    min: 0
-    default: 0
-    show if: child_support_deviation
+#   - label: How much will be paid for child support?
+#     field: child_support_amount_value
+#     datatype: currency
+#     min: 0
+#     default: 0
+#     show if: child_support_deviation
 
-  - label: How often will child support payments be made?
-    field: child_support_frequency
-    input type: dropdown
-    choices:
-      - Weekly
-      - Monthly
-      - Other
-  - label: If Other, please specify
-    field: child_support_frequency_other
-    show if:
-      variable: child_support_frequency
-      is: "Other"
+#   - label: How often will child support payments be made?
+#     field: child_support_frequency
+#     input type: dropdown
+#     choices:
+#       - Weekly
+#       - Monthly
+#       - Other
+#   - label: If Other, please specify
+#     field: child_support_frequency_other
+#     show if:
+#       variable: child_support_frequency
+#       is: "Other"
 
-  - label: Does support end at the 21st birthday of a single child or the youngest child?
-    field: child_support_applies_to
-    datatype: radio
-    choices:
-      - child
-      - youngest child
-    show if:
-      variable: has_more_than_one_child
-      is: True
+#   - label: Does support end at the 21st birthday of a single child or the youngest child?
+#     field: child_support_applies_to
+#     datatype: radio
+#     choices:
+#       - child
+#       - youngest child
+#     show if:
+#       variable: has_more_than_one_child
+#       is: True
 
-  - label: Do you agree that child support will stop when the child turns 21?
-    field: child_support_ends_at_21
-    datatype: yesnoradio 
+#   - label: Do you agree that child support will stop when the child turns 21?
+#     field: child_support_ends_at_21
+#     datatype: yesnoradio 
 ---
 id: Health Insurance
 question: |
   Health Insurance
-fields:
+fields: 
   - "Will each of you be responsible for your own health insurance?": health_insurance_self_responsible
-    datatype: yesno
-  - "If there is an extra cost to keep one spouse on the other's health insurance, have you agreed that the coverage can continue as long as someone pays the added cost?s": health_insurance_with_cost_allowed
-    datatype: yesno
+    input type: dropdown
+    choices: 
+      - Yes
+      - No 
+
+  - "Will each of you be responsible for paying your own uninsured medical, dental, and vision expenses?": uninsured_expenses_self_responsible
+    datatype: dropdown
+    choices: 
+      - Yes
+      - No
+
+  - "Who will get the health insurance coverage from the other spouse?": health_insurance_recipient_adult
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+    show if: 
+      variable: health_insurance_self_responsible
+      is: No
+
   - "Which spouse will provide health insurance for the other?": health_insurance_provider_adult
     input type: dropdown
     choices:
       - Party A
       - Party B
-      - N/A
+    show if: 
+      variable: health_insurance_self_responsible
+      is: No 
+
   - "What type of health insurance will be provided for the other spouse?": health_insurance_types_adult
     datatype: checkboxes
     choices:
       - Medical
       - Dental
       - Vision
-  - "Type": type
-  - "Who will get the health insurance coverage from the other spouse?": health_insurance_recipient_adult
-    input type: dropdown
-    choices:
-      - Party A
-      - Party B
+    show if:
+      variable: health_insurance_self_responsible
+      is: No
+
+  - "If there is an extra cost to keep one spouse on the other's health insurance, have you agreed that the coverage can continue as long as someone pays the added cost?": health_insurance_with_cost_allowed
+    datatype: dropdown
+    choices: 
+      - Yes 
+      - No
+    show if: 
+      variable: health_insurance_self_responsible
+      is: No
+
   - "If there’s an extra cost to keep one spouse on health insurance, who will pay that extra cost?": health_insurance_cost_payer_adult
     input type: dropdown
     choices:
       - Party A
       - Party B
-      - N/A
-  - "Will each of you be responsible for paying your own uninsured medical, dental, and vision expenses?": uninsured_expenses_self_responsible
-    datatype: yesno
+    show if: 
+      variable: health_insurance_self_responsible
+      is: No
+
   - "Do you have custom terms for either Party's health insurance coverage?": health_insurance_custom_terms_adult
     datatype: yesno
+
   - "What are the specific details of the health insurance agreement between you and your spouse?": health_insurance_custom_description_adult
+---
+--- 
+id: Children Health Insurance
+question: | 
+  Children Health Insurance
+fields: 
   - "Who will provide health insurance for the children?": health_insurance_provided_for_children
     input type: dropdown
     choices:
@@ -383,6 +418,21 @@ fields:
   - "Do you have custom terms for the child(ren)'s health insurance?": health_insurance_custom_terms_children
     datatype: yesno
   - "What is the agreement for the child(ren)'s health insurance coverage?": health_insurance_custom_description_children
+---
+id: Education
+question: |
+  College or Trade School Costs
+fields:
+  - "Do you and your spouse agree to contribute to the child(ren)'s college or trade school costs based on what each of you can afford?": education_cost_based_on_ability 
+    datatype: yesno
+      
+  - "Do you have custom terms for education expenses?": education_custom_terms
+    datatype: yesno
+      
+  - "Describe your agreement about college or trade school expenses:": education_custom_description
+    show if: 
+      variable: education_custom_terms
+      is: True
 ---
 id: Alimony
 question: |
