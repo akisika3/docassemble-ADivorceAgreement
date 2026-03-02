@@ -98,9 +98,22 @@ code: |
     parenting_time_assigned
     health_insurance_provided_for_children
     education_cost_based_on_ability
+    child_tax_claim_single_party
   set_progress(14)  
   health_insurance_self_responsible
   alimony_waived_all
+  if not alimony_waived_all:
+    alimony_payment_agreed
+    if alimony_payment_agreed:
+        alimony_payer
+        alimony_recipient
+        alimony_amount_value
+        alimony_frequency
+        alimony_due_on
+        alimony_end_date
+        alimony_custom_description
+    
+  
   taxes_file_separately
   no_real_estate
   set_progress(28)
@@ -221,15 +234,22 @@ id: Parenting time
 question: | 
   Parenting Time 
 fields: 
-  - "Describe the parenting time arrangement": parenting_time_description
-  - "Have you and your spouse made a separate schedule for parenting time, holidays, or vacations?": parenting_time_attached_schedule
   - "Have you and your spouse agreed on a parenting time schedule?": parenting_time_assigned
-    datatype: yesno
+    input type: dropdown
+    choices: 
+      - Yes
+      - No 
   - "Which parent will have scheduled parenting time with the child or children?": parenting_time_recipient
     input type: dropdown
     choices:
       - Party A
       - Party B
+  - "Describe the parenting time arrangement": parenting_time_description
+  - "Have you and your spouse made a separate schedule for parenting time, holidays, or vacations?": parenting_time_attached_schedule
+    input type: dropdown
+    choices: 
+      - Yes
+      - No
 ---
 # id: child_support
 # show if: has_children
@@ -391,30 +411,34 @@ fields:
     datatype: yesno
 
   - "What are the specific details of the health insurance agreement between you and your spouse?": health_insurance_custom_description_adult
+    show if:
+      variable: health_insurance_custom_terms_adult
+      is: Yes 
 ---
 --- 
 id: Children Health Insurance
 question: | 
   Children Health Insurance
 fields: 
-  - "Who will provide health insurance for the children?": health_insurance_provided_for_children
-    input type: dropdown
-    choices:
-      - Party A
-      - Party B
+  - "We agree on how to provide health insurance for the children": health_insurance_provided_for_children
+    datatype: yesno
+  - "We agree to provide health insurance for the the children until they are emancipated ": health_insurance_until
+    datatype: yesno
   - "Which parent will provide health insurance for the child or children?": health_insurance_provider_children
     input type: dropdown
     choices:
       - Party A
       - Party B
-  - "What type(s) of health insurance will be provided for the children?": health_insurance_types_children
+  - "Will the child(ren) be on a MassHealth or a private plan?": health_insurance_types_children
     input type: dropdown
     choices:
       - MassHealth
       - Private Plan
-  - "How long will health insurance be provided for the children?": health_insurance_until
   - "Will you and your spouse split the cost of your children’s uninsured medical or dental bills 50/50?": uninsured_expenses_split_children
-    datatype: yesno
+    input type: dropdown
+    choices: 
+      - Yes
+      - No
   - "Do you have custom terms for the child(ren)'s health insurance?": health_insurance_custom_terms_children
     datatype: yesno
   - "What is the agreement for the child(ren)'s health insurance coverage?": health_insurance_custom_description_children
@@ -423,72 +447,123 @@ id: Education
 question: |
   College or Trade School Costs
 fields:
-  - "Do you and your spouse agree to contribute to the child(ren)'s college or trade school costs based on what each of you can afford?": education_cost_based_on_ability 
+  - "We agree to split college or trade school costs evenly": education_cost_based_on_ability 
     datatype: yesno
       
   - "Do you have custom terms for education expenses?": education_custom_terms
-    datatype: yesno
+    input type: dropdown
+    choices: 
+      - Yes
+      - No
       
   - "Describe your agreement about college or trade school expenses:": education_custom_description
     show if: 
       variable: education_custom_terms
-      is: True
+      is: Yes
+---
 ---
 id: Alimony
 question: |
   Alimony
 fields:
-  - "Have both you and your spouse agreed to give up any right to receive alimony now or in the future?": alimony_waived_all
+  - "We do not want alimony now or in the future": alimony_waived_all
     datatype: yesno
+
   - "One party will pay alimony to the other": alimony_payment_agreed
     datatype: yesno
+    show if:
+      variable: alimony_waived_all
+      is: False
+
   - "Who will be paying alimony?": alimony_payer
     input type: dropdown
     choices:
       - Party A
       - Party B
-      - N/A
+    show if:
+      variable: alimony_payment_agreed
+      is: True
+
   - "Who will receive alimony payments?": alimony_recipient
     input type: dropdown
     choices:
       - Party A
       - Party B
-      - N/A
+    show if:
+      variable: alimony_payment_agreed
+      is: True
+
   - "Alimony amount value": alimony_amount_value
     datatype: currency
     min: 0
+    show if:
+      variable: alimony_payment_agreed
+      is: True
+
   - "How often will alimony payments be made?": alimony_frequency
+    input type: dropdown
+    choices:
+      - Weekly
+      - Biweekly
+      - Monthly
+      - Other
+    show if:
+      variable: alimony_payment_agreed
+      is: True
+
   - "What day will alimony payments be due?": alimony_due_on
     input type: dropdown
     choices:
       - Every Friday
       - First day of each month
-  - "f alimony will end on a specific date (not just when someone remarries or passes away), what is that date?": alimony_end_date
+    show if:
+      variable: alimony_payment_agreed
+      is: True
+
+  - "If alimony will end on a specific date (instead of when someone remarries or passes away), what is that date?": alimony_end_date
     datatype: date
-  - "Past and present alimony is waived. Future alimony is not waived.": alimony_waived_future_only
-    datatype: checkboxes
-    choices:
-      - None
+    show if:
+      variable: alimony_payment_agreed
+      is: True
+
   - "What is your alimony agreement?": alimony_custom_description
+    datatype: area
+    show if:
+      variable: alimony_payment_agreed
+      is: True
 ---
 id: Taxes
 question: |
   Taxes
 fields:
-  - "Have you and your spouse agreed to file your taxes separately from now on?": taxes_file_separately
+  - "We agree to file taxes separately from now on": taxes_file_separately
     datatype: yesno
-  - "Tax debt responsibility set": tax_debt_responsibility_set
+
+  - "We have filed and paid all taxes during the marriage": taxes_fully_reported
+    datatype: yesno
+
+  - "Will one party be responsible for any unpaid tax debt?": tax_debt_responsibility_set
+    datatype: yesno
+    show if:
+      variable: taxes_fully_reported
+      is: False
+
   - "Who will be responsible for any unpaid tax debt?": tax_debt_responsible_party
     input type: dropdown
     choices:
       - Party A
       - Party B
-      - N/A
-  - "Have you and your spouse both filed and paid all your taxes during the marriage?": taxes_fully_reported
-    datatype: yesno
+    show if:
+      variable: tax_debt_responsibility_set
+      is: True
   - "Do you have custom terms for taxes?": taxes_custom_terms
     datatype: yesno
   - "What is your agreement for taxes?": taxes_custom_description
+---
+id: Children Tax
+question: | 
+  Children tax
+fields: 
   - "Have you agreed that one parent will claim the child or children on taxes every year? If yes, which parent?": child_tax_claim_single_party
     input type: dropdown
     choices:
