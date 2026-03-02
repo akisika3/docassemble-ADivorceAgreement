@@ -99,6 +99,7 @@ code: |
     health_insurance_provided_for_children
     education_cost_based_on_ability
     child_tax_claim_single_party
+    users1_life_insurance_required
   set_progress(14)  
   health_insurance_self_responsible
   alimony_waived_all
@@ -115,8 +116,14 @@ code: |
     
   
   taxes_file_separately
+  
   no_real_estate 
-  if not no_real_estate:
+  if no_real_estate:
+    real_estate_address
+    real_estate_current_owner
+    real_estate_county
+    real_estate_book
+    real_estate_page
     real_estate_transfer
 
     if real_estate_transfer:
@@ -125,19 +132,13 @@ code: |
         real_estate_cost_responsible
         real_estate_start_date
 
-    real_estate_address
-    real_estate_current_owner
-    real_estate_county
-    real_estate_book
-    real_estate_page
-
     real_estate_custom_terms
     if real_estate_custom_terms:
         real_estate_custom_description
 
   set_progress(28)
   no_marital_debt
-  if no_marital_debt: 
+  if not no_marital_debt: 
     marital_debt_custom_terms
     if marital_debt_custom_terms: 
       marital_debt_custom_description
@@ -491,7 +492,6 @@ fields:
       variable: education_custom_terms
       is: True
 ---
----
 id: Alimony
 question: |
   Alimony
@@ -631,14 +631,17 @@ question: |
   Marital Property
 fields:
 
-  - "We do not own any real estate, either together or separately": no_real_estate
-    datatype: yesno
+  - "We do not own any real estate": no_real_estate
+    datatype: button
+    choices: 
+      - We have no real estate: True
+      - We have real estate: False 
 
   - "Have you and your spouse agreed that one of you will keep a piece of real estate as part of the divorce?": real_estate_transfer
     datatype: yesno
     show if:
       variable: no_real_estate
-      is: True
+      is: False
 
   - "Who will keep the real estate property?": real_estate_owner_name
     input type: dropdown
@@ -750,27 +753,27 @@ question: |
   Debts and Liabilities
 fields:
   - "Do you have shared debts or liabilities from the marriage?": no_marital_debt
-    input type: dropdown
+    input type: buttons
     choices: 
-      - Yes
-      - No 
+      - Yes: True
+      - No: False 
   - "Do you agree on how to pay shared debts and liabilities?": debt_custom_terms
-    input type: dropdown
+    input type: buttons
     choices: 
-      - Yes
-      - No
+      - Yes: True
+      - No: False
     show if: 
       variable: no_marital_debt
-      is: Yes
+      is: True
   - "What is your agreement for debts and liabilities?": debt_custom_description
     show if: 
       variable: debt_custom_terms
       is: Yes
-  - "We will each pay debts in our own name": individual_debt_responsible_each
-    input type: dropdown
+  - "Will you each pay debts in our own name?": individual_debt_responsible_each
+    input type: buttons
     choices: 
-      - Yes
-      - No
+      - Yes: True
+      - No: False
   - "Does Party A have debts or liabilities?": users[0].debt_listed
     input type: dropdown
     choices:
@@ -778,16 +781,16 @@ fields:
       - No   
     show if: 
       variable: individual_debt_responsible_each
-      is: No
+      is: False
   - "What debts and liabilities will Party A be responsible for?": users[0].debt_description
     show if: 
       variable: users[0].debt_listed
-      is: Yes 
+      is: True 
   - "Does Party B have debts or liabilities?": other_parties[0].debt_listed
-    input type: dropdown
+    input type: button
     choices: 
-      - Yes
-      - No
+      - Yes: True
+      - No: False
     show if:
       variable: individual_debt_responsible_each
       is: No
@@ -800,27 +803,53 @@ id: Pension and Retirement Plans
 question: |
   Pension and Retirement Plans
 fields:
-  - "The parties have no retirement or pension benefits to be divided": no_retirement_benefits
-    datatype: yesno
-  - "Have you and your spouse agreed to give up any right to each other’s retirement or pension benefits?": retirement_interest_waived
-    datatype: yesno
-  - "Have you and your spouse agreed to divide any retirement or pension benefits?": retirement_benefits_divided
-    datatype: yesno
+  - "Do you either of you have retirement or pension benefits": no_retirement_benefits
+    input type: dropdown
+    choices: 
+      - Yes
+      - No
+  - "Are you waiving interest to each other's retirement or pension benefits?": retirement_interest_waived
+    input type: dropdown
+    choices: 
+      - Yes
+      - No
+    show if: 
+      variable: no_retirement_benefits
+      is: Yes
+  - "Are you to dividing retirement or pension benefits?": retirement_benefits_divided
+    input type: dropdown
+    choices: 
+      - Yes
+      - No
+    show if:
+      variable: retirement_interest_waived
+      is: No 
   - "How will you and your spouse divide any retirement or pension benefits?": retirement_division_description
+    show if: 
+      variable: retirement_benefits_divided
+      is: Yes
 ---
 id: Life Insurance
 question: |
   Life Insurance
 fields:
-  - "Do you and your spouse currently have no life insurance policies?": no_life_insurance
+  - "We have no life insurance policies": no_life_insurance
     datatype: yesno
-  - "Will Party A keep their current life insurance and name the children (or a trust for the children) as the beneficiaries?": users1_life_insurance_required
-    datatype: yesno
-  - "Will Party B shall maintain in full force and effect their present life insurance on their life, with the child(ren) of the parties, or a trust for the benefit of the child(ren) of the parties, as beneficiary?": other_parties1_life_insurance_required
-    datatype: yesno
-  - "Do you have custom terms for life insurance?": life_insurance_custom_terms
+  - "One of us will maintain life insurance for the other": life_insurance_custom_terms
     datatype: yesno
   - "What special terms have you and your spouse agreed to about life insurance?": life_insurance_custom_description
+    show if: 
+      variable: life_insurance_custom_terms
+      is: True
+---
+id: Children Life Insurance
+question: | 
+  Children Life Insurance
+fields:
+  - "Party A is keeping their current life insurance and naming the children as the beneficiaries": users1_life_insurance_required
+    datatype: yesno
+  - "Party B is keeping their current life insurance and naming the children as beneficiaries": other_parties1_life_insurance_required
+    datatype: yesno
 ---
 id: Merger Survival
 question: |
