@@ -559,6 +559,9 @@ fields:
   - "Do you have custom terms for taxes?": taxes_custom_terms
     datatype: yesno
   - "What is your agreement for taxes?": taxes_custom_description
+    show if: 
+      variable: taxes_custom_terms
+      is: True 
 ---
 id: Children Tax
 question: | 
@@ -597,10 +600,13 @@ id: Marital Property
 question: |
   Marital Property
 fields:
-  - "Do you and your spouse own any real estate together or separately?": no_real_estate
+  - "We do not own any real estate, either together or separately": no_real_estate
     datatype: yesno
   - "Have you and your spouse agreed that one of you will keep a piece of real estate as part of the divorce?": real_estate_transfer
     datatype: yesno
+    show if:
+      variable: no_real_estate
+      is: True 
   - "Who will keep the real estate property?": real_estate_owner_name
     input type: dropdown
     choices:
