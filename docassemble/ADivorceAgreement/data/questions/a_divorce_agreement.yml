@@ -118,7 +118,7 @@ code: |
   taxes_file_separately
   
   no_real_estate 
-  if no_real_estate:
+  if not no_real_estate:
     real_estate_address
     real_estate_current_owner
     real_estate_county
@@ -137,6 +137,7 @@ code: |
         real_estate_custom_description
 
   set_progress(28)
+  personal_property_already_divided
   no_marital_debt
   if not no_marital_debt: 
     marital_debt_custom_terms
@@ -570,15 +571,21 @@ fields:
     datatype: yesno
 
   - "We have filed and paid all taxes during the marriage": taxes_fully_reported
-    datatype: yesno
+    datatype: button
+    choices: 
+      - Yes: True
+      - No: False
 
-  - "Will one party be responsible for any unpaid tax debt?": tax_debt_responsibility_set
-    datatype: yesno
+  - "Do you have unpaid tax debt?": tax_debt_responsibility_set
+    datatype: button
+    choices: 
+      - Yes: True
+      - No: False
     show if:
       variable: taxes_fully_reported
       is: False
 
-  - "Who will be responsible for any unpaid tax debt?": tax_debt_responsible_party
+  - "Who will be responsible for the tax debt?": tax_debt_responsible_party
     input type: dropdown
     choices:
       - Party A
@@ -586,7 +593,7 @@ fields:
     show if:
       variable: tax_debt_responsibility_set
       is: True
-  - "Do you have custom terms for taxes?": taxes_custom_terms
+  - "We want the court to know additional terms to our tax agreement": taxes_custom_terms
     datatype: yesno
   - "What is your agreement for taxes?": taxes_custom_description
     show if: 
@@ -626,49 +633,30 @@ fields:
     datatype: yesno
   - "What custom agreement have you made about who will claim the child or children on tax returns?": child_tax_claim_custom_description
 ---
-id: Marital Property
+id: Marital Property Ownership
 question: |
-  Marital Property
+  Real Estate Ownership
 fields:
-
-  - "We do not own any real estate": no_real_estate
+  - "Do you own real estate?": no_real_estate
     datatype: button
     choices: 
       - We have no real estate: True
       - We have real estate: False 
+---
+id: Property Details
+question: | 
+  Address and Information
+fields: 
+  - "What is the full address of the property?": real_estate_address
 
-  - "Have you and your spouse agreed that one of you will keep a piece of real estate as part of the divorce?": real_estate_transfer
-    datatype: yesno
-    show if:
-      variable: no_real_estate
-      is: False
-
-  - "Who will keep the real estate property?": real_estate_owner_name
-    input type: dropdown
-    choices:
-      - N/A
-      - Party A
-      - Party B
-    show if:
-      variable: no_real_estate
-      is: False
-
-  - "What is the full address of the real estate property involved in your agreement?": real_estate_address
-    show if:
-      variable: no_real_estate
-      is: False
-
-  - "Whose name is currently on the deed for the real estate property?": real_estate_current_owner
+  - "Whose name is currently on the deed?": real_estate_current_owner
     input type: dropdown
     choices:
       - Party A
       - Party B
-      - N/A
-    show if:
-      variable: no_real_estate
-      is: False
+      - Both
 
-  - "What county is the real estate property located in?": real_estate_county
+  - "What county is the property located in?": real_estate_county
     input type: dropdown
     choices:
       - Barnstable
@@ -676,77 +664,96 @@ fields:
       - Essex
       - Middlesex
       - Suffolk
-    show if:
-      variable: no_real_estate
-      is: False
 
-  - "What is the book number where the deed for the real estate is recorded?": real_estate_book
-    show if:
-      variable: no_real_estate
-      is: False
+  - "Book number": real_estate_book
 
-  - "What is the page number in the Registry of Deeds where the real estate is recorded?": real_estate_page
-    show if:
-      variable: no_real_estate
-      is: False
+  - "Page number": real_estate_page
+---
+id: real_estate_transfer
+question: |
+  Transfer of Property
+fields:
+  - "Will either party keep the property?": real_estate_transfer
+    datatype: button
+    choices: 
+      - One of us will keep the property: True
+      - We will sell the property: False
 
-  - "Is a party waiving interest in the property?": real_estate_waiver_party
+  - "Who will keep the property?": real_estate_owner_name
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+    show if:
+      variable: real_estate_transfer
+      is: True
+
+  - "Is a party waiving interest?": real_estate_waiver_party
     input type: dropdown
     choices:
       - No
       - Party A
       - Party B
     show if:
-      variable: no_real_estate
-      is: False
+      variable: real_estate_transfer
+      is: True
 
-  - "Who will be responsible for paying the costs and expenses for the real estate?": real_estate_cost_responsible
+  - "Who pays ongoing costs?": real_estate_cost_responsible
     input type: dropdown
     choices:
       - Party A
       - Party B
     show if:
-      variable: no_real_estate
-      is: False
+      variable: real_estate_transfer
+      is: True
 
-  - "When will the person taking over the property start being responsible for its costs?": real_estate_start_date
+  - "When does responsibility begin?": real_estate_start_date
     datatype: date
     show if:
-      variable: no_real_estate
-      is: False
-
-  - "Do you have custom terms for real estate?": real_estate_custom_terms
+      variable: real_estate_transfer
+      is: True
+---
+id: Real Estate Custom Terms
+question: | 
+  Real Estate Custom terms
+fields:
+  - "We have additional terms to divide real estate": real_estate_custom_terms
     datatype: yesno
-    show if:
-      variable: no_real_estate
-      is: False
 
-  - "Real estate custom description": real_estate_custom_description
+  - "Describe your real estate agreement": real_estate_custom_description
     show if:
       variable: real_estate_custom_terms
       is: True
+
 ---
 id: Personal Property
 question: | 
   Personal Property
 fields: 
-  - "Personal property already divided": personal_property_already_divided
-    datatype: yesno
+  - "Did you already divide your personal property": personal_property_already_divided
+    datatype: button
+    choices: 
+      - We already divided our personal property: True
+      - We have not yet divided personal property: False
 
-  - "Do you and your spouse have a plan for how to divide your personal property?": personal_property_divide_plan
-    datatype: yesno
+  - "Do you and your spouse have personal property to divide?": personal_property_divide_plan
+    datatype: button
+    choices: 
+      - We have personal property to divide: True
+      - We do not have personal property to divide: False  
     show if: 
       variable: personal_property_already_divided
       is: False 
-
+  - "Describe how you will divide perosnal property": personal_property_divide_description
+    datatype: text
+    show if: 
+      variable: personal_property_divide_plan
+      is: True
   - "Date of Personal property divide": personal_property_divide_date
     datatype: date
     show if: 
       variable: personal_property_divide_plan
       is: True
-
-  - "We have a plan property division": personal_property_divide_description
-    datatype: yesno
 ---
 id: Debts and Liabilities
 question: |
