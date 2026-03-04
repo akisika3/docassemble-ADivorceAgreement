@@ -91,12 +91,24 @@ code: |
   users.gather()
   set_parts(subtitle=str(users))
   A_Divorce_Agreement
-  has_no_children
+  has_children
   if has_children: 
     children.gather()
     custody_custom_terms
-    parenting_time_assigned
+    parenting_time_assigned 
+    if parenting_time_assigned:
+        parenting_time_recipient
+        parenting_time_description
+        parenting_time_attached_schedule
+      
     health_insurance_provided_for_children
+    health_insurance_until
+    if health_insurance_until: 
+        health_insurance_provider_children
+        health_insurance_types_children
+        uninsured_expenses_split_children
+        health_insurance_custom_terms_children
+        health_insurance_custom_terms_description
     education_cost_based_on_ability
     child_tax_claim_single_party
     users1_life_insurance_required
@@ -193,18 +205,35 @@ subquestion: |
   
   Before you get started, please gather:
   
-  1. 
-  1. 
-  1. 
+  1. Basic Information
+      - Full legal names, home addresses, birth dates of spouses and children
+      - Name of court and docket number
+  2. Financial Information
+      - Information about each spouses income and expenses
+      - Recent statements for bank accounts
+      - Information about retirement accounts
+      - List of all debts (credit cards, loans, medical bills, tax debts, etc.)
+  
+  3. Agreements you have made
+      - How you will divide your property and debts
+      - Any alimony you have agreed to
+      - How you will handle health insurance coverage after divorce
+  4. ** If you have any unemancipated children **
+      - Your proposed custody and parenting time schedule
+      - Child support, including amount calculated by the Massachusetts Child Support Guidelines
+      - How health insurance will be provided for the children
+      - How you will share college and extracurricular costs
   
   When you are finished, you will need to:
   
-  1. 
-  1.
+  1. File your agreement with the court
+  2. File a 1A petition with the court
+  3. File a Financial Statement for each spouse
+  4. Attach your Parenting Plan if you have one
 
   If you are a  co-petitioner, you can use this interview to complete and file a 1A agreement.
 
-  Most people take about 30 minutes to complete this interview.
+  Most people take about 1 hour to complete this interview.
 ---
 id: 1A Divorce Agreement
 question: |
@@ -215,10 +244,12 @@ id: Children
 question: |
   Children
 fields:
-  - We do not have minor children together: has_no_children
-    datatype: yesno
-  - "We do have minor children together": has_children
-    datatype: yesno
+  - "Do you have unemancipated children together?": has_children
+    datatype: button
+    choices: 
+      - "We do have minor children together": True
+      - "We do not have minor children together": False
+    
 ---
 id: child info 
 question: | 
@@ -266,7 +297,7 @@ id: Parenting time
 question: | 
   Parenting Time 
 fields: 
-  - "Have you and your spouse agreed on a parenting time schedule?": parenting_time_assigned
+  - "Will one of you have parenting time?": parenting_time_assigned
     input type: dropdown
     choices: 
       - Yes
@@ -276,12 +307,21 @@ fields:
     choices:
       - Party A
       - Party B
+    show if: 
+      variable: parenting_time_assigned
+      is: Yes
   - "Describe the parenting time arrangement": parenting_time_description
-  - "Have you and your spouse made a separate schedule for parenting time, holidays, or vacations?": parenting_time_attached_schedule
+    show if: 
+      variable: parenting_time_assigned
+      is: Yes
+  - "Do you have a parenting time schedule for special occasions, holidays, or vacations to attach to this agreement?": parenting_time_attached_schedule
     input type: dropdown
     choices: 
       - Yes
       - No
+    show if:
+      variable: parenting_time_assigned
+      is: Yes
 ---
 # id: child_support
 # show if: has_children
@@ -417,10 +457,10 @@ fields:
       - Medical
       - Dental
       - Vision
-    show if:
+    show if: 
       variable: health_insurance_self_responsible
-      is: No
-
+      is: False 
+    
   - "If there is an extra cost to keep one spouse on the other's health insurance, have you agreed that the coverage can continue as long as someone pays the added cost?": health_insurance_with_cost_allowed
     datatype: dropdown
     choices: 
@@ -446,21 +486,28 @@ fields:
     show if:
       variable: health_insurance_custom_terms_adult
       is: Yes 
+
 ---
---- 
+    
 id: Children Health Insurance
 question: | 
   Children Health Insurance
 fields: 
   - "We agree on how to provide health insurance for the children": health_insurance_provided_for_children
-    datatype: yesno
+    datatype: buttons
+    choices: 
+      - Yes: True
+      - No: False 
   - "We agree to provide health insurance for the the children until they are emancipated ": health_insurance_until
-    datatype: yesno
+    datatype: buttons
+    choices: 
+      - Yes: True
+      - No: False 
   - "Which parent will provide health insurance for the child or children?": health_insurance_provider_children
     input type: dropdown
     choices:
       - Party A
-      - Party B
+      - Party B 
   - "Will the child(ren) be on a MassHealth or a private plan?": health_insurance_types_children
     input type: dropdown
     choices:
@@ -470,10 +517,13 @@ fields:
     input type: dropdown
     choices: 
       - Yes
-      - No
-  - "Do you have custom terms for the child(ren)'s health insurance?": health_insurance_custom_terms_children
-    datatype: yesno
-  - "What is the agreement for the child(ren)'s health insurance coverage?": health_insurance_custom_description_children
+      - No 
+  - "Are there additional terms you want to put in your agreement about health insurance for the child(ren)?": health_insurance_custom_terms_children
+    datatype: buttons
+    choices: 
+      - Yes: True
+      - No: False
+  - "How will medical and dental expenses be divided?": health_insurance_custom_description_children
 ---
 id: Education
 question: |
