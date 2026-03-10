@@ -100,18 +100,22 @@ code: |
         parenting_time_recipient
         parenting_time_description
         parenting_time_attached_schedule
-      
-    health_insurance_provided_for_children
-    health_insurance_until
-    if health_insurance_until: 
-        health_insurance_provider_children
-        health_insurance_types_children
-        uninsured_expenses_split_children
-        health_insurance_custom_terms_children
-        health_insurance_custom_terms_description
-    education_cost_based_on_ability
-    child_tax_claim_single_party
-    users1_life_insurance_required
+       
+  health_insurance_provided_for_children   
+
+  if not health_insurance_provided_for_children: 
+      health_insurance_exit  
+  
+  if health_insurance_provided_for_children: 
+      health_insurance_provider_children
+      health_insurance_types_children
+      uninsured_expenses_split_children
+      health_insurance_custom_terms_children
+      health_insurance_custom_description_children
+  
+  education_cost_based_on_ability
+  child_tax_claim_single_party
+  users1_life_insurance_required
   set_progress(14)  
   health_insurance_self_responsible
   alimony_waived_all
@@ -298,30 +302,27 @@ question: |
   Parenting Time 
 fields: 
   - "Will one of you have parenting time?": parenting_time_assigned
-    input type: dropdown
-    choices: 
-      - Yes
-      - No 
+    datatype: yesnoradio
   - "Which parent will have scheduled parenting time with the child or children?": parenting_time_recipient
-    input type: dropdown
+    input type: radio
     choices:
       - Party A
       - Party B
     show if: 
       variable: parenting_time_assigned
-      is: Yes
+      is: True
   - "Describe the parenting time arrangement": parenting_time_description
     show if: 
       variable: parenting_time_assigned
-      is: Yes
+      is: True
   - "Do you have a parenting time schedule for special occasions, holidays, or vacations to attach to this agreement?": parenting_time_attached_schedule
-    input type: dropdown
+    input type: yesnoradio
     choices: 
       - Yes
       - No
     show if:
       variable: parenting_time_assigned
-      is: Yes
+      is: True
 ---
 # id: child_support
 # show if: has_children
@@ -487,22 +488,34 @@ fields:
       variable: health_insurance_custom_terms_adult
       is: Yes 
 
+---  
+id: Children Health Insurance agreement
+question: |
+  Children's Health Insurance
+fields:
+  - "We agree to provide health insurance for the children until they are emancipated.": health_insurance_provided_for_children
+    datatype: yesnoradio
 ---
-    
-id: Children Health Insurance
+code: |
+  health_insurance_until = health_insurance_provided_for_children
+  if not health_insurance_provided_for_children: 
+      health_insurance_exit 
+--- 
+id: health_insurance_exit
+event: health_insurance_exit
+question: |
+  You cannot continue with this agreement
+subquestion: |
+  This agreement requires that both parties agree to provide health insurance for the children until they are emancipated.
+
+  Because you selected **No**, this interview cannot continue.
+buttons:
+  - Exit: exit
+---
+id: 
 question: | 
-  Children Health Insurance
+  Health Insurance for Children Info
 fields: 
-  - "We agree on how to provide health insurance for the children": health_insurance_provided_for_children
-    datatype: buttons
-    choices: 
-      - Yes: True
-      - No: False 
-  - "We agree to provide health insurance for the the children until they are emancipated ": health_insurance_until
-    datatype: buttons
-    choices: 
-      - Yes: True
-      - No: False 
   - "Which parent will provide health insurance for the child or children?": health_insurance_provider_children
     input type: dropdown
     choices:
