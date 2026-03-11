@@ -79,6 +79,7 @@ sections:
   - review_a_divorce_agreement: Review your answers
 ---
 #################### Interview order #####################
+
 comment: |
   Controls order and branching logic for questions specific to this form
 id: interview_order_a_divorce_agreement
@@ -90,95 +91,105 @@ code: |
   user_ask_role = "plaintiff"
   users.gather()
   set_parts(subtitle=str(users))
-  A_Divorce_Agreement
-  has_children
-  if has_children: 
-    children.gather()
-    custody_custom_terms
-    parenting_time_assigned 
-    if parenting_time_assigned:
-        parenting_time_recipient
-        parenting_time_description
-        parenting_time_attached_schedule
-       
-  health_insurance_provided_for_children   
 
-  if not health_insurance_provided_for_children: 
-      health_insurance_exit  
-  
-  if health_insurance_provided_for_children: 
+  A_Divorce_Agreement
+
+  has_children
+  if has_children:
+      children.gather()
+      custody_custom_terms
+      parenting_time_assigned
+      if parenting_time_assigned:
+          parenting_time_recipient
+          parenting_time_description
+          parenting_time_attached_schedule
+
+  health_insurance_provided_for_children
+
+  if not health_insurance_provided_for_children:
+      health_insurance_exit
+
+  if health_insurance_provided_for_children:
       health_insurance_provider_children
       health_insurance_types_children
       uninsured_expenses_split_children
       health_insurance_custom_terms_children
       health_insurance_custom_description_children
-  
+
   education_cost_based_on_ability
   child_tax_claim_single_party
   users1_life_insurance_required
-  set_progress(14)  
+
+  set_progress(14)
+
   health_insurance_self_responsible
   alimony_waived_all
+
   if not alimony_waived_all:
-    alimony_payment_agreed
-    if alimony_payment_agreed:
-        alimony_payer
-        alimony_recipient
-        alimony_amount_value
-        alimony_frequency
-        alimony_due_on
-        alimony_end_date
-        alimony_custom_description
-    
-  
+      alimony_payment_agreed
+      if alimony_payment_agreed:
+          alimony_payer
+          alimony_recipient
+          alimony_amount_value
+          alimony_frequency
+          alimony_due_on
+          alimony_end_date
+          alimony_custom_description
+
   taxes_file_separately
-  
-  no_real_estate 
+
+  no_real_estate
   if not no_real_estate:
-    real_estate_address
-    real_estate_current_owner
-    real_estate_county
-    real_estate_book
-    real_estate_page
-    real_estate_transfer
+      real_estate_address
+      real_estate_current_owner
+      real_estate_county
+      real_estate_book
+      real_estate_page
+      real_estate_transfer
 
-    if real_estate_transfer:
-        real_estate_owner_name
-        real_estate_waiver_party
-        real_estate_cost_responsible
-        real_estate_start_date
+      if real_estate_transfer:
+          real_estate_owner_name
+          real_estate_waiver_party
+          real_estate_cost_responsible
+          real_estate_start_date
 
-    real_estate_custom_terms
-    if real_estate_custom_terms:
-        real_estate_custom_description
+      real_estate_custom_terms
+      if real_estate_custom_terms:
+          real_estate_custom_description
 
   set_progress(28)
+
   personal_property_already_divided
   no_marital_debt
-  if not no_marital_debt: 
-    marital_debt_custom_terms
-    if marital_debt_custom_terms: 
-      marital_debt_custom_description
-  
+  if not no_marital_debt:
+      marital_debt_custom_terms
+      if marital_debt_custom_terms:
+          marital_debt_custom_description
+
   individual_debt_responsible_each
-  if not individual_debt_responsible_each: 
-    users[0].debt_listed
-    other_parties[0].debt_listed
-    
-    
+  if not individual_debt_responsible_each:
+      users[0].debt_listed
+      other_parties[0].debt_listed
+
   no_retirement_benefits
   no_life_insurance
   agreement_merge_fully
   users1_initials
+
   set_progress(42)
+
   trial_court.division
   other_parties[0].address.address
   other_parties.gather()
+
   set_progress(56)
+
   users[0].address.address
   signature_date
   docket_number
+
   interview_order_a_divorce_agreement = True
+---
 ---
 ###################### Main order ######################
 comment: |
@@ -423,34 +434,34 @@ question: |
   Health Insurance
 fields: 
   - "Will each of you be responsible for your own health insurance?": health_insurance_self_responsible
-    input type: dropdown
+    input type: radio
     choices: 
-      - Yes
-      - No 
+      - Yes: True 
+      - No: False 
 
   - "Will each of you be responsible for paying your own uninsured medical, dental, and vision expenses?": uninsured_expenses_self_responsible
-    datatype: dropdown
+    datatype: radio
     choices: 
-      - Yes
-      - No
+      - Yes: True 
+      - No: False
 
   - "Who will get the health insurance coverage from the other spouse?": health_insurance_recipient_adult
-    input type: dropdown
+    input type: radio
     choices:
       - Party A
       - Party B
     show if: 
       variable: health_insurance_self_responsible
-      is: No
+      is: False
 
   - "Which spouse will provide health insurance for the other?": health_insurance_provider_adult
-    input type: dropdown
+    input type: radio
     choices:
       - Party A
       - Party B
     show if: 
       variable: health_insurance_self_responsible
-      is: No 
+      is: False
 
   - "What type of health insurance will be provided for the other spouse?": health_insurance_types_adult
     datatype: checkboxes
@@ -469,7 +480,7 @@ fields:
       - No
     show if: 
       variable: health_insurance_self_responsible
-      is: No
+      is: False
 
   - "If there’s an extra cost to keep one spouse on health insurance, who will pay that extra cost?": health_insurance_cost_payer_adult
     input type: dropdown
@@ -478,7 +489,7 @@ fields:
       - Party B
     show if: 
       variable: health_insurance_self_responsible
-      is: No
+      is: False
 
   - "Do you have custom terms for either Party's health insurance coverage?": health_insurance_custom_terms_adult
     datatype: yesno
@@ -640,13 +651,13 @@ fields:
     datatype: yesno
 
   - "We have filed and paid all taxes during the marriage": taxes_fully_reported
-    datatype: button
+    input type: radio
     choices: 
       - Yes: True
       - No: False
 
   - "Do you have unpaid tax debt?": tax_debt_responsibility_set
-    datatype: button
+    input type: radio
     choices: 
       - Yes: True
       - No: False
@@ -655,7 +666,7 @@ fields:
       is: False
 
   - "Who will be responsible for the tax debt?": tax_debt_responsible_party
-    input type: dropdown
+    input type: radio
     choices:
       - Party A
       - Party B
@@ -725,26 +736,28 @@ fields:
 ---
 id: Marital Property Ownership
 question: |
-  Real Estate Ownership
+  Real Estate 
 fields:
   - "Do you own real estate?": no_real_estate
-    datatype: button
+    input type: radio
     choices: 
-      - We have no real estate: True
-      - We have real estate: False 
----
-id: Property Details
-question: | 
-  Address and Information
-fields: 
+      - Yes: False
+      - No: True
+ 
   - "What is the full address of the property?": real_estate_address
-
+    show if: 
+      variable: no_real_estate
+      is: False 
+    
   - "Whose name is currently on the deed?": real_estate_current_owner
     input type: dropdown
     choices:
       - Party A
       - Party B
       - Both
+    show if:
+      variable: no_real_estate
+      is: False
 
   - "What county is the property located in?": real_estate_county
     input type: dropdown
@@ -754,23 +767,32 @@ fields:
       - Essex
       - Middlesex
       - Suffolk
+    show if: 
+      variable: no_real_estate
+      is: False
 
   - "Book number": real_estate_book
+    show if: 
+      variable: no_real_estate
+      is: False
 
   - "Page number": real_estate_page
+    show if: 
+      variable: no_real_estate
+      is: False
 ---
 id: real_estate_transfer
 question: |
   Transfer of Property
 fields:
   - "Will either party keep the property?": real_estate_transfer
-    datatype: button
+    input type: radio
     choices: 
-      - One of us will keep the property: True
-      - We will sell the property: False
+      - Yes: True
+      - No: False
 
   - "Who will keep the property?": real_estate_owner_name
-    input type: dropdown
+    input type: radio
     choices:
       - Party A
       - Party B
@@ -778,8 +800,8 @@ fields:
       variable: real_estate_transfer
       is: True
 
-  - "Is a party waiving interest?": real_estate_waiver_party
-    input type: dropdown
+  - "Is either party waiving interest?": real_estate_waiver_party
+    input type: radio
     choices:
       - No
       - Party A
@@ -789,7 +811,7 @@ fields:
       is: True
 
   - "Who pays ongoing costs?": real_estate_cost_responsible
-    input type: dropdown
+    input type: radio
     choices:
       - Party A
       - Party B
@@ -820,26 +842,26 @@ id: Personal Property
 question: | 
   Personal Property
 fields: 
-  - "Did you already divide your personal property": personal_property_already_divided
-    datatype: button
+  - "Have you already divided all of your personal property?": personal_property_already_divided
+    input type: radio
     choices: 
-      - We already divided our personal property: True
-      - We have not yet divided personal property: False
+      - Yes: True
+      - No: False
 
-  - "Do you and your spouse have personal property to divide?": personal_property_divide_plan
-    datatype: button
+  - "Do you have personal property left to divide?": personal_property_divide_plan
+    input type: radio
     choices: 
-      - We have personal property to divide: True
-      - We do not have personal property to divide: False  
+      - Yes: True
+      - No: False  
     show if: 
       variable: personal_property_already_divided
       is: False 
-  - "Describe how you will divide perosnal property": personal_property_divide_description
+  - "How you will divide personal property?": personal_property_divide_description
     datatype: text
     show if: 
       variable: personal_property_divide_plan
       is: True
-  - "Date of Personal property divide": personal_property_divide_date
+  - "What date will you divide the property by?": personal_property_divide_date
     datatype: date
     show if: 
       variable: personal_property_divide_plan
@@ -850,12 +872,12 @@ question: |
   Debts and Liabilities
 fields:
   - "Do you have shared debts or liabilities from the marriage?": no_marital_debt
-    input type: buttons
+    input type: radio
     choices: 
       - Yes: True
       - No: False 
   - "Do you agree on how to pay shared debts and liabilities?": debt_custom_terms
-    input type: buttons
+    input type: radio
     choices: 
       - Yes: True
       - No: False
@@ -867,12 +889,12 @@ fields:
       variable: debt_custom_terms
       is: Yes
   - "Will you each pay debts in our own name?": individual_debt_responsible_each
-    input type: buttons
+    input type: radio
     choices: 
       - Yes: True
       - No: False
   - "Does Party A have debts or liabilities?": users[0].debt_listed
-    input type: dropdown
+    input type: radio
     choices:
       - Yes
       - No   
@@ -901,30 +923,30 @@ question: |
   Pension and Retirement Plans
 fields:
   - "Do you either of you have retirement or pension benefits": no_retirement_benefits
-    input type: dropdown
+    input type: radio
     choices: 
-      - Yes
-      - No
+      - Yes: True
+      - No: False
   - "Are you waiving interest to each other's retirement or pension benefits?": retirement_interest_waived
-    input type: dropdown
+    input type: radio
     choices: 
-      - Yes
-      - No
+      - Yes: True
+      - No: False
     show if: 
       variable: no_retirement_benefits
-      is: Yes
-  - "Are you to dividing retirement or pension benefits?": retirement_benefits_divided
-    input type: dropdown
+      is: True
+  - "Are you dividing retirement or pension benefits?": retirement_benefits_divided
+    input type: radio
     choices: 
-      - Yes
-      - No
+      - Yes: True
+      - No: False
     show if:
       variable: retirement_interest_waived
-      is: No 
+      is: False 
   - "How will you and your spouse divide any retirement or pension benefits?": retirement_division_description
     show if: 
       variable: retirement_benefits_divided
-      is: Yes
+      is: True
 ---
 id: Life Insurance
 question: |
