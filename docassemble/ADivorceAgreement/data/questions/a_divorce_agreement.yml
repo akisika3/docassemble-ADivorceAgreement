@@ -249,10 +249,10 @@ question: |
   Children
 fields:
   - "Do you have unemancipated children together?": has_children
-    datatype: button
+    datatype: radio
     choices: 
-      - "We do have minor children together": True
-      - "We do not have minor children together": False
+      - "Yes": True
+      - "No": False
     
 ---
 id: child info 
@@ -316,7 +316,7 @@ fields:
       variable: parenting_time_assigned
       is: True
   - "Do you have a parenting time schedule for special occasions, holidays, or vacations to attach to this agreement?": parenting_time_attached_schedule
-    input type: yesnoradio
+    input type: radio
     choices: 
       - Yes
       - No
@@ -517,22 +517,22 @@ question: |
   Health Insurance for Children Info
 fields: 
   - "Which parent will provide health insurance for the child or children?": health_insurance_provider_children
-    input type: dropdown
+    datatype: radio
     choices:
       - Party A
-      - Party B 
+      - Party B
   - "Will the child(ren) be on a MassHealth or a private plan?": health_insurance_types_children
-    input type: dropdown
+    datatype: radio
     choices:
       - MassHealth
       - Private Plan
   - "Will you and your spouse split the cost of your children’s uninsured medical or dental bills 50/50?": uninsured_expenses_split_children
-    input type: dropdown
+    datatype: radio
     choices: 
       - Yes
       - No 
   - "Are there additional terms you want to put in your agreement about health insurance for the child(ren)?": health_insurance_custom_terms_children
-    datatype: buttons
+    datatype: radio
     choices: 
       - Yes: True
       - No: False
@@ -542,19 +542,25 @@ id: Education
 question: |
   College or Trade School Costs
 fields:
-  - "We agree to split college or trade school costs evenly": education_cost_based_on_ability 
-    datatype: yesno
+  - "We agree to split college or trade school costs evenly": education_cost_based_on_ability
+    datatype: yesnoradio
       
   - "Do you have custom terms for education expenses?": education_custom_terms
-    input type: dropdown
-    choices: 
-      - Yes
-      - No
-      
-  - "Describe your agreement about college or trade school expenses:": education_custom_description
-    show if: 
-      variable: education_custom_terms
+    datatype: yesnoradio
+    show if:
+      variable: education_cost_based_on_ability
       is: True
+      
+  - "How will you pay for college or trade school expenses?": education_custom_description
+    datatype: area
+    show if:
+      variable: education_cost_based_on_ability 
+      is: False 
+  - "How will you pay for college or trade school expenses?": education_custom_description
+    datatype: area
+    show if:
+      variable:  education_custom_terms 
+      is: True 
 ---
 id: Alimony
 question: |
@@ -663,38 +669,59 @@ fields:
       variable: taxes_custom_terms
       is: True 
 ---
-id: Children Tax
+id: Child Tax Claim
 question: | 
-  Children tax
+  Children Tax Claim
 fields: 
-  - "Have you agreed that one parent will claim the child or children on taxes every year? If yes, which parent?": child_tax_claim_single_party
-    input type: dropdown
+  - "Will one of you claim the child(ren) on taxes every year?": child_tax_claim_single_party
+    input type: radio
+    choices:
+      - Yes: True
+      - No: False
+  - "Which party?": child_tax_single_party
+    input type: radio
     choices:
       - Party A
       - Party B
-      - N/A
-  - "Which parent will claim the child(ren) on their taxes every year?": child_tax_single_party
-    input type: dropdown
+    show if: 
+      variable: child_tax_claim_single_party
+      is: True 
+  - "Will you claim the child(ren) in alternating years?": child_tax_claim_split_years
+    input type: radio
+    choices: 
+      - Yes: True
+      - No: False  
+    show if:
+      variable: child_tax_claim_single_party
+      is: False
+    
+  - "Which parent will claim the child(ren) on odd-numbered years?": child_tax_odd_year_party
+    input type: radio
     choices:
       - Party A
       - Party B
-  - "Have you agreed that each of you will take turns claiming the child or children on taxes in alternating years?": child_tax_claim_split_years
-    datatype: yesno
-  - "Which parent will claim the child or children on their taxes in odd-numbered years?": child_tax_odd_year_party
-    input type: dropdown
-    choices:
-      - Party A
-      - Party B
-      - N/A
+    show if: 
+      variable: child_tax_claim_split_years
+      is: True
+
   - "Which parent will claim the child or children on their taxes in even-numbered years?": child_tax_even_year_party
-    input type: dropdown
+    input type: radio
     choices:
       - Party A
       - Party B
-      - N/A
+    show if:
+      variable: child_tax_claim_split_years
+      is: True
   - "Do you have custom terms for claiming the child(ren) on taxes?": child_tax_claim_custom_terms
-    datatype: yesno
+    input type: radio
+    choices: 
+      - Yes
+      - No   
   - "What custom agreement have you made about who will claim the child or children on tax returns?": child_tax_claim_custom_description
+    show if: 
+      variable: child_tax_claim_custom_terms
+      is: True
+      
 ---
 id: Marital Property Ownership
 question: |
