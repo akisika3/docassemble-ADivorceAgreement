@@ -79,7 +79,6 @@ sections:
   - review_a_divorce_agreement: Review your answers
 ---
 #################### Interview order #####################
-
 comment: |
   Controls order and branching logic for questions specific to this form
 id: interview_order_a_divorce_agreement
@@ -91,105 +90,32 @@ code: |
   user_ask_role = "plaintiff"
   users.gather()
   set_parts(subtitle=str(users))
-
   A_Divorce_Agreement
-
-  has_children
-  if has_children:
-      children.gather()
-      custody_custom_terms
-      parenting_time_assigned
-      if parenting_time_assigned:
-          parenting_time_recipient
-          parenting_time_description
-          parenting_time_attached_schedule
-
-  health_insurance_provided_for_children
-
-  if not health_insurance_provided_for_children:
-      health_insurance_exit
-
-  if health_insurance_provided_for_children:
-      health_insurance_provider_children
-      health_insurance_types_children
-      uninsured_expenses_split_children
-      health_insurance_custom_terms_children
-      health_insurance_custom_description_children
-
-  education_cost_based_on_ability
-  child_tax_claim_single_party
-  users1_life_insurance_required
-
+  has_no_children
+  custody_custom_terms
+  child_support_wage_assignment
   set_progress(14)
-
+  education_cost_based_on_ability
   health_insurance_self_responsible
   alimony_waived_all
-
-  if not alimony_waived_all:
-      alimony_payment_agreed
-      if alimony_payment_agreed:
-          alimony_payer
-          alimony_recipient
-          alimony_amount_value
-          alimony_frequency
-          alimony_due_on
-          alimony_end_date
-          alimony_custom_description
-
   taxes_file_separately
-
   no_real_estate
-  if not no_real_estate:
-      real_estate_address
-      real_estate_current_owner
-      real_estate_county
-      real_estate_book
-      real_estate_page
-      real_estate_transfer
-
-      if real_estate_transfer:
-          real_estate_owner_name
-          real_estate_waiver_party
-          real_estate_cost_responsible
-          real_estate_start_date
-
-      real_estate_custom_terms
-      if real_estate_custom_terms:
-          real_estate_custom_description
-
   set_progress(28)
-
-  personal_property_already_divided
   no_marital_debt
-  if not no_marital_debt:
-      marital_debt_custom_terms
-      if marital_debt_custom_terms:
-          marital_debt_custom_description
-
-  individual_debt_responsible_each
-  if not individual_debt_responsible_each:
-      users[0].debt_listed
-      other_parties[0].debt_listed
-
   no_retirement_benefits
   no_life_insurance
   agreement_merge_fully
   users1_initials
-
   set_progress(42)
-
   trial_court.division
+  children.gather()
   other_parties[0].address.address
   other_parties.gather()
-
   set_progress(56)
-
   users[0].address.address
   signature_date
   docket_number
-
   interview_order_a_divorce_agreement = True
----
 ---
 ###################### Main order ######################
 comment: |
@@ -220,35 +146,18 @@ subquestion: |
   
   Before you get started, please gather:
   
-  1. Basic Information
-      - Full legal names, home addresses, birth dates of spouses and children
-      - Name of court and docket number
-  2. Financial Information
-      - Information about each spouses income and expenses
-      - Recent statements for bank accounts
-      - Information about retirement accounts
-      - List of all debts (credit cards, loans, medical bills, tax debts, etc.)
-  
-  3. Agreements you have made
-      - How you will divide your property and debts
-      - Any alimony you have agreed to
-      - How you will handle health insurance coverage after divorce
-  4. ** If you have any unemancipated children **
-      - Your proposed custody and parenting time schedule
-      - Child support, including amount calculated by the Massachusetts Child Support Guidelines
-      - How health insurance will be provided for the children
-      - How you will share college and extracurricular costs
+  1. 
+  1. 
+  1. 
   
   When you are finished, you will need to:
   
-  1. File your agreement with the court
-  2. File a 1A petition with the court
-  3. File a Financial Statement for each spouse
-  4. Attach your Parenting Plan if you have one
+  1. 
+  1.
 
   If you are a  co-petitioner, you can use this interview to complete and file a 1A agreement.
 
-  Most people take about 1 hour to complete this interview.
+  Most people take about 30 minutes to complete this interview.
 ---
 id: 1A Divorce Agreement
 question: |
@@ -259,507 +168,267 @@ id: Children
 question: |
   Children
 fields:
-  - "Do you have unemancipated children together?": has_children
-    datatype: radio
-    choices: 
-      - "Yes": True
-      - "No": False
-    
----
-id: child info 
-question: | 
-    Tell us about your child(ren)
-fields: 
-  - "What is your child's first name?": children[i].name.first
-  - "What is your child’s date of birth?": children[i].birthdate
+  - "Do you and your spouse have no children together who are still minors or dependent?": has_no_children
+    datatype: yesno
+  - "Do you and your spouse have any unemancipated  children together?": has_children
+    datatype: yesno
+  - "What is your child's first name?": child.name.first
+  - "What is your child’s date of birth?": child.birthdate
     datatype: date
 ---
-id: Child Custody 
+id: Child Custody and Parenting Time
 question: |
-  Custody Type
-subquestion: |
-  Choose the custody arrangement you and your spouse have agreed to.
+  Child Custody and Parenting Time
 fields:
-  - "Please select one custody arrangement:": custody_type_choice
-    datatype: radio
-    choices:
-      - Joint legal and physical custody
-      - Joint legal custody, one parent has physical custody
-      - One parent has sole legal and physical custody
-
-  - "Who will have sole custody of the child(ren)?": sole_custody_holder
+  - "Do you have custom terms for custody?": custody_custom_terms
+    datatype: yesno
+  - "Describe the parenting time arrangement": parenting_time_description
+  - "Have you and your spouse agreed to share legal custody, but have one parent be the main caretaker (physical custody)?": custody_joint_legal_split_physical
+    datatype: yesno
+  - "Should all the child-related parts of your agreement (like custody, parenting time, and support) be changeable by the court in the future?": merge_child_issues
+    datatype: yesno
+  - "Have you and your spouse agreed that only one of you will have full legal and physical custody of the child or children?": custody_sole
+    datatype: yesno
+  - "The parties shall have joint legal and physical custody of the minor child(ren).": custody_joint_legal_physical
+    datatype: yesno
+  - "Which parent will have scheduled parenting time with the child or children?": parenting_time_recipient
     input type: dropdown
     choices:
       - Party A
       - Party B
-    show if:
-      variable: custody_type_choice
-      is: "One parent has sole legal and physical custody"
-
-  - "Do you have custom terms for custody?": custody_custom_terms
-    datatype: yesnoradio
-
-  - "Describe your custom custody arrangement:": custody_custom_description
-    show if: custody_custom_terms
----
-code: |
-  custody_joint_legal_physical = (custody_type_choice == "Joint legal and physical custody")
-  custody_joint_legal_split_physical = (custody_type_choice == "Joint legal custody, one parent has physical custody")
-  custody_sole = (custody_type_choice == "One parent has sole legal and physical custody")
-
---- 
-id: Parenting time
-question: | 
-  Parenting Time 
-fields: 
-  - "Will one of you have parenting time?": parenting_time_assigned
-    datatype: yesnoradio
-  - "Which parent will have scheduled parenting time with the child or children?": parenting_time_recipient
-    input type: radio
+  - "Which parent will the child(ren) live with most of the time?": physical_custody_holder
+    input type: dropdown
     choices:
       - Party A
       - Party B
-    show if: 
-      variable: parenting_time_assigned
-      is: True
-  - "Describe the parenting time arrangement": parenting_time_description
-    show if: 
-      variable: parenting_time_assigned
-      is: True
-  - "Do you have a parenting time schedule for special occasions, holidays, or vacations to attach to this agreement?": parenting_time_attached_schedule
-    input type: radio
-    choices: 
-      - Yes
+  - "Have you and your spouse made a separate schedule for parenting time, holidays, or vacations?": parenting_time_attached_schedule
+  - "Does either Party want sole custody of the child(ren)?": sole_custody_holder
+    input type: dropdown
+    choices:
       - No
-    show if:
-      variable: parenting_time_assigned
-      is: True
+      - Party A
+      - Party B
+  - "What is the custody arrangement you agreed to?": custody_custom_description
+  - "Have you and your spouse agreed on a parenting time schedule?": parenting_time_assigned
+    datatype: yesno
 ---
-# id: child_support
-# show if: has_children
-# question: |
-#   Child Support
-# subquestion: |
-#   Child support is money one parent pays to help with a child's financial needs when the parents don't live together.
-
-#   **Calculate child support before answering.** You should complete the Child Support Guidelines worksheet before answering the questions below. The 2025 Child Support Guidelines and forms are effective December 1, 2025. In addition, you can find a worksheet for calculating child support, and a chart of per child calculations based on income.
-
-#   <a href="https://www.mass.gov/info-details/probate-and-family-court-2025-child-support-guidelines-worksheet-cjd-304" target="_blank" rel="noopener">Probate and Family Court 2025 Child Support Guidelines Worksheet (CJD 304)</a> (effective December 1, 2025)
-
-#   Source: <a href="https://www.mass.gov/info-details/child-support-guidelines" target="_blank" rel="noopener">Child Support Guidelines | Mass.gov</a>
-
-#   Answer the questions below about how child support will be handled in your agreement.
-# fields:
-#   - label: Who will make child support payments?
-#     field: child_support_payer
-#     input type: dropdown
-#     choices:
-#       - Party A
-#       - Party B
-
-#   - label: Will child support be paid through a wage assignment handled by the Department of Revenue?
-#     field: child_support_wage_assignment
-#     datatype: yesnoradio
-
-#   - label: If the full child support amount is not paid through wage assignment, who will make up the difference?
-#     field: child_support_shortfall_payer
-#     input type: dropdown
-#     choices:
-#       - Party A
-#       - Party B
-#       - Other
-#     show if: child_support_wage_assignment
-
-#   - label: Will child support be paid directly (not through wage assignment)?
-#     field: child_support_direct_payment
-#     datatype: yesnoradio
-#     show if: not child_support_wage_assignment
-
-#   - label: Who will receive the child support payments?
-#     field: child_support_recipient
-#     input type: dropdown
-#     choices:
-#       - Party A
-#       - Party B
-
-#   - label: What is the weekly child support amount calculated by the Massachusetts Child Support Guidelines?
-#     field: child_support_guideline_amount
-#     datatype: currency
-#     min: 0
-#     default: 0
-
-#   - label: Are you and your spouse choosing a different child support amount than the state's suggested amount?
-#     field: child_support_deviation
-#     datatype: yesnoradio
-#   - label: Why are you agreeing to a different child support amount?
-#     field: child_support_deviation_reason
-#     show if: child_support_deviation
-
-#   - label: How much will be paid for child support?
-#     field: child_support_amount_value
-#     datatype: currency
-#     min: 0
-#     default: 0
-#     show if: child_support_deviation
-
-#   - label: How often will child support payments be made?
-#     field: child_support_frequency
-#     input type: dropdown
-#     choices:
-#       - Weekly
-#       - Monthly
-#       - Other
-#   - label: If Other, please specify
-#     field: child_support_frequency_other
-#     show if:
-#       variable: child_support_frequency
-#       is: "Other"
-
-#   - label: Does support end at the 21st birthday of a single child or the youngest child?
-#     field: child_support_applies_to
-#     datatype: radio
-#     choices:
-#       - child
-#       - youngest child
-#     show if:
-#       variable: has_more_than_one_child
-#       is: True
-
-#   - label: Do you agree that child support will stop when the child turns 21?
-#     field: child_support_ends_at_21
-#     datatype: yesnoradio 
+id: Child Support
+question: |
+  Child Support
+fields:
+  - "Will child support be paid through a wage assignment handled by the Department of Revenue?": child_support_wage_assignment
+    datatype: yesno
+  - "Who will make child support payments?": child_support_payer
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+      - N/A
+  - "Who will receive the child support payments?": child_support_recipient
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+      - N/A
+  - "How much will be paid for child support?": child_support_amount_value
+    datatype: currency
+    min: 0
+  - "How often will child support payments be made?": child_support_frequency
+  - "If the full child support amount is not paid through wage assignment, please provide who will be making up the difference.": child_support_shortfall_payer
+  - "Child support direct payment": child_support_direct_payment
+  - "Who will pay child support?": child_support_applies_to
+    input type: dropdown
+    choices:
+      - N/A
+      - Party A
+      - Party B
+  - "Do you agree that child support will stop when the child turns 21?": child_support_ends_at_21
+    datatype: yesno
+  - "Are you and your spouse choosing a different child support amount than the state's suggested amount?": child_support_deviation
+    datatype: yesno
+  - "What is the weekly child support amount calculated by the Massachusetts Child Support Guidelines?": child_support_guideline_amount
+    datatype: currency
+    min: 0
+  - "Why are you agreeing to a different child support amount?": child_support_deviation_reason
+---
+id: Education and Extracurriculars Children
+question: |
+  Education and Extracurriculars (Children)
+fields:
+  - "Do you and your pouse agree to contribute to the child(ren)'s college or trade school costs based on what each of you can afford?": education_cost_based_on_ability
+    datatype: yesno
+  - "Do you have custom terms for education?": education_custom_terms
+    datatype: yesno
+  - "How will you divide the cost of college or trade school after high school?": education_custom_description
+  - "Do you have custom terms for extracurriculars?": extracurricular_custom_terms
+    datatype: yesno
+  - "Extracurricular description": extracurricular_description
 ---
 id: Health Insurance
 question: |
   Health Insurance
-fields: 
+fields:
   - "Will each of you be responsible for your own health insurance?": health_insurance_self_responsible
-    input type: radio
-    choices: 
-      - Yes: True 
-      - No: False 
-
-  - "Will each of you be responsible for paying your own uninsured medical, dental, and vision expenses?": uninsured_expenses_self_responsible
-    datatype: radio
-    choices: 
-      - Yes: True 
-      - No: False
-
-  - "Who will get the health insurance coverage from the other spouse?": health_insurance_recipient_adult
-    input type: radio
-    choices:
-      - Party A
-      - Party B
-    show if: 
-      variable: health_insurance_self_responsible
-      is: False
-
+    datatype: yesno
+  - "If there is an extra cost to keep one spouse on the other's health insurance, have you agreed that the coverage can continue as long as someone pays the added cost?s": health_insurance_with_cost_allowed
+    datatype: yesno
   - "Which spouse will provide health insurance for the other?": health_insurance_provider_adult
-    input type: radio
+    input type: dropdown
     choices:
       - Party A
       - Party B
-    show if: 
-      variable: health_insurance_self_responsible
-      is: False
-
+      - N/A
   - "What type of health insurance will be provided for the other spouse?": health_insurance_types_adult
     datatype: checkboxes
     choices:
       - Medical
       - Dental
       - Vision
-    show if: 
-      variable: health_insurance_self_responsible
-      is: False 
-    
-  - "If there is an extra cost to keep one spouse on the other's health insurance, have you agreed that the coverage can continue as long as someone pays the added cost?": health_insurance_with_cost_allowed
-    datatype: dropdown
-    choices: 
-      - Yes 
-      - No
-    show if: 
-      variable: health_insurance_self_responsible
-      is: False
-
+  - "Type": type
+  - "Who will get the health insurance coverage from the other spouse?": health_insurance_recipient_adult
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
   - "If there’s an extra cost to keep one spouse on health insurance, who will pay that extra cost?": health_insurance_cost_payer_adult
     input type: dropdown
     choices:
       - Party A
       - Party B
-    show if: 
-      variable: health_insurance_self_responsible
-      is: False
-
+      - N/A
+  - "Will each of you be responsible for paying your own uninsured medical, dental, and vision expenses?": uninsured_expenses_self_responsible
+    datatype: yesno
   - "Do you have custom terms for either Party's health insurance coverage?": health_insurance_custom_terms_adult
     datatype: yesno
-
   - "What are the specific details of the health insurance agreement between you and your spouse?": health_insurance_custom_description_adult
-    show if:
-      variable: health_insurance_custom_terms_adult
-      is: Yes 
-
----  
-id: Children Health Insurance agreement
-question: |
-  Children's Health Insurance
-fields:
-  - "We agree to provide health insurance for the children until they are emancipated.": health_insurance_provided_for_children
-    datatype: yesnoradio
----
-code: |
-  health_insurance_until = health_insurance_provided_for_children
-  if not health_insurance_provided_for_children: 
-      health_insurance_exit 
---- 
-id: health_insurance_exit
-event: health_insurance_exit
-question: |
-  You cannot continue with this agreement
-subquestion: |
-  This agreement requires that both parties agree to provide health insurance for the children until they are emancipated.
-
-  Because you selected **No**, this interview cannot continue.
-buttons:
-  - Exit: exit
----
-id: 
-question: | 
-  Health Insurance for Children Info
-fields: 
-  - "Which parent will provide health insurance for the child or children?": health_insurance_provider_children
-    datatype: radio
+  - "Who will provide health insurance for the children?": health_insurance_provided_for_children
+    input type: dropdown
     choices:
       - Party A
       - Party B
-  - "Will the child(ren) be on a MassHealth or a private plan?": health_insurance_types_children
-    datatype: radio
+  - "Which parent will provide health insurance for the child or children?": health_insurance_provider_children
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+  - "What type(s) of health insurance will be provided for the children?": health_insurance_types_children
+    input type: dropdown
     choices:
       - MassHealth
       - Private Plan
+  - "How long will health insurance be provided for the children?": health_insurance_until
   - "Will you and your spouse split the cost of your children’s uninsured medical or dental bills 50/50?": uninsured_expenses_split_children
-    datatype: radio
-    choices: 
-      - Yes
-      - No 
-  - "Are there additional terms you want to put in your agreement about health insurance for the child(ren)?": health_insurance_custom_terms_children
-    datatype: radio
-    choices: 
-      - Yes: True
-      - No: False
-  - "How will medical and dental expenses be divided?": health_insurance_custom_description_children
----
-id: Education
-question: |
-  College or Trade School Costs
-fields:
-  - "We agree to split college or trade school costs evenly": education_cost_based_on_ability
-    datatype: yesnoradio
-      
-  - "Do you have custom terms for education expenses?": education_custom_terms
-    datatype: yesnoradio
-    show if:
-      variable: education_cost_based_on_ability
-      is: True
-      
-  - "How will you pay for college or trade school expenses?": education_custom_description
-    datatype: area
-    show if:
-      variable: education_cost_based_on_ability 
-      is: False 
-  - "How will you pay for college or trade school expenses?": education_custom_description
-    datatype: area
-    show if:
-      variable:  education_custom_terms 
-      is: True 
+    datatype: yesno
+  - "Do you have custom terms for the child(ren)'s health insurance?": health_insurance_custom_terms_children
+    datatype: yesno
+  - "What is the agreement for the child(ren)'s health insurance coverage?": health_insurance_custom_description_children
 ---
 id: Alimony
 question: |
   Alimony
 fields:
-  - "We do not want alimony now or in the future": alimony_waived_all
+  - "Have both you and your spouse agreed to give up any right to receive alimony now or in the future?": alimony_waived_all
     datatype: yesno
-
   - "One party will pay alimony to the other": alimony_payment_agreed
     datatype: yesno
-    show if:
-      variable: alimony_waived_all
-      is: False
-
   - "Who will be paying alimony?": alimony_payer
     input type: dropdown
     choices:
       - Party A
       - Party B
-    show if:
-      variable: alimony_payment_agreed
-      is: True
-
+      - N/A
   - "Who will receive alimony payments?": alimony_recipient
     input type: dropdown
     choices:
       - Party A
       - Party B
-    show if:
-      variable: alimony_payment_agreed
-      is: True
-
+      - N/A
   - "Alimony amount value": alimony_amount_value
     datatype: currency
     min: 0
-    show if:
-      variable: alimony_payment_agreed
-      is: True
-
   - "How often will alimony payments be made?": alimony_frequency
-    input type: dropdown
-    choices:
-      - Weekly
-      - Biweekly
-      - Monthly
-      - Other
-    show if:
-      variable: alimony_payment_agreed
-      is: True
-
   - "What day will alimony payments be due?": alimony_due_on
     input type: dropdown
     choices:
       - Every Friday
       - First day of each month
-    show if:
-      variable: alimony_payment_agreed
-      is: True
-
-  - "If alimony will end on a specific date (instead of when someone remarries or passes away), what is that date?": alimony_end_date
+  - "f alimony will end on a specific date (not just when someone remarries or passes away), what is that date?": alimony_end_date
     datatype: date
-    show if:
-      variable: alimony_payment_agreed
-      is: True
-
+  - "Past and present alimony is waived. Future alimony is not waived.": alimony_waived_future_only
+    datatype: checkboxes
+    choices:
+      - None
   - "What is your alimony agreement?": alimony_custom_description
-    datatype: area
-    show if:
-      variable: alimony_payment_agreed
-      is: True
 ---
 id: Taxes
 question: |
   Taxes
 fields:
-  - "We agree to file taxes separately from now on": taxes_file_separately
+  - "Have you and your spouse agreed to file your taxes separately from now on?": taxes_file_separately
     datatype: yesno
-
-  - "We have filed and paid all taxes during the marriage": taxes_fully_reported
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False
-
-  - "Do you have unpaid tax debt?": tax_debt_responsibility_set
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False
-    show if:
-      variable: taxes_fully_reported
-      is: False
-
-  - "Who will be responsible for the tax debt?": tax_debt_responsible_party
-    input type: radio
-    choices:
-      - Party A
-      - Party B
-    show if:
-      variable: tax_debt_responsibility_set
-      is: True
-  - "We want the court to know additional terms to our tax agreement": taxes_custom_terms
-    datatype: yesno
-  - "What is your agreement for taxes?": taxes_custom_description
-    show if: 
-      variable: taxes_custom_terms
-      is: True 
----
-id: Child Tax Claim
-question: | 
-  Children Tax Claim
-fields: 
-  - "Will one of you claim the child(ren) on taxes every year?": child_tax_claim_single_party
-    input type: radio
-    choices:
-      - Yes: True
-      - No: False
-  - "Which party?": child_tax_single_party
-    input type: radio
-    choices:
-      - Party A
-      - Party B
-    show if: 
-      variable: child_tax_claim_single_party
-      is: True 
-  - "Will you claim the child(ren) in alternating years?": child_tax_claim_split_years
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False  
-    show if:
-      variable: child_tax_claim_single_party
-      is: False
-    
-  - "Which parent will claim the child(ren) on odd-numbered years?": child_tax_odd_year_party
-    input type: radio
-    choices:
-      - Party A
-      - Party B
-    show if: 
-      variable: child_tax_claim_split_years
-      is: True
-
-  - "Which parent will claim the child or children on their taxes in even-numbered years?": child_tax_even_year_party
-    input type: radio
-    choices:
-      - Party A
-      - Party B
-    show if:
-      variable: child_tax_claim_split_years
-      is: True
-  - "Do you have custom terms for claiming the child(ren) on taxes?": child_tax_claim_custom_terms
-    input type: radio
-    choices: 
-      - Yes
-      - No   
-  - "What custom agreement have you made about who will claim the child or children on tax returns?": child_tax_claim_custom_description
-    show if: 
-      variable: child_tax_claim_custom_terms
-      is: True
-      
----
-id: Marital Property Ownership
-question: |
-  Real Estate 
-fields:
-  - "Do you own real estate?": no_real_estate
-    input type: radio
-    choices: 
-      - Yes: False
-      - No: True
- 
-  - "What is the full address of the property?": real_estate_address
-    show if: 
-      variable: no_real_estate
-      is: False 
-    
-  - "Whose name is currently on the deed?": real_estate_current_owner
+  - "Tax debt responsibility set": tax_debt_responsibility_set
+  - "Who will be responsible for any unpaid tax debt?": tax_debt_responsible_party
     input type: dropdown
     choices:
       - Party A
       - Party B
-      - Both
-    show if:
-      variable: no_real_estate
-      is: False
-
-  - "What county is the property located in?": real_estate_county
+      - N/A
+  - "Have you and your spouse both filed and paid all your taxes during the marriage?": taxes_fully_reported
+    datatype: yesno
+  - "Do you have custom terms for taxes?": taxes_custom_terms
+    datatype: yesno
+  - "What is your agreement for taxes?": taxes_custom_description
+  - "Have you agreed that one parent will claim the child or children on taxes every year? If yes, which parent?": child_tax_claim_single_party
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+      - N/A
+  - "Which parent will claim the child(ren) on their taxes every year?": child_tax_single_party
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+  - "Have you agreed that each of you will take turns claiming the child or children on taxes in alternating years?": child_tax_claim_split_years
+    datatype: yesno
+  - "Which parent will claim the child or children on their taxes in odd-numbered years?": child_tax_odd_year_party
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+      - N/A
+  - "Which parent will claim the child or children on their taxes in even-numbered years?": child_tax_even_year_party
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+      - N/A
+  - "Do you have custom terms for claiming the child(ren) on taxes?": child_tax_claim_custom_terms
+    datatype: yesno
+  - "What custom agreement have you made about who will claim the child or children on tax returns?": child_tax_claim_custom_description
+---
+id: Marital Property
+question: |
+  Marital Property
+fields:
+  - "Do you and your spouse own any real estate together or separately?": no_real_estate
+    datatype: yesno
+  - "Have you and your spouse agreed that one of you will keep a piece of real estate as part of the divorce?": real_estate_transfer
+    datatype: yesno
+  - "Who will keep the real estate property?": real_estate_owner_name
+    input type: dropdown
+    choices:
+      - N/A
+      - Party A
+      - Party B
+  - "What is the full address of the real estate property involved in your agreement?": real_estate_address
+  - "Whose name is currently on the deed for the real estate property?": real_estate_current_owner
+    input type: dropdown
+    choices:
+      - Party A
+      - Party B
+      - N/A
+  - "What county is the real estate property located in?": real_estate_county
     input type: dropdown
     choices:
       - Barnstable
@@ -767,208 +436,73 @@ fields:
       - Essex
       - Middlesex
       - Suffolk
-    show if: 
-      variable: no_real_estate
-      is: False
-
-  - "Book number": real_estate_book
-    show if: 
-      variable: no_real_estate
-      is: False
-
-  - "Page number": real_estate_page
-    show if: 
-      variable: no_real_estate
-      is: False
----
-id: real_estate_transfer
-question: |
-  Transfer of Property
-fields:
-  - "Will either party keep the property?": real_estate_transfer
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False
-
-  - "Who will keep the property?": real_estate_owner_name
-    input type: radio
-    choices:
-      - Party A
-      - Party B
-    show if:
-      variable: real_estate_transfer
-      is: True
-
-  - "Is either party waiving interest?": real_estate_waiver_party
-    input type: radio
+  - "What is the book number where the deed for the real estate is recorded?": real_estate_book
+  - "What is the page number in the Registry of Deeds where the real estate is recorded?": real_estate_page
+  - "Is a party waiving interest in the property?": real_estate_waiver_party
+    input type: dropdown
     choices:
       - No
       - Party A
       - Party B
-    show if:
-      variable: real_estate_transfer
-      is: True
-
-  - "Who pays ongoing costs?": real_estate_cost_responsible
-    input type: radio
+  - "Who will be responsible for paying the costs and expenses for the real estate?": real_estate_cost_responsible
+    input type: dropdown
     choices:
       - Party A
       - Party B
-    show if:
-      variable: real_estate_transfer
-      is: True
-
-  - "When does responsibility begin?": real_estate_start_date
+  - "When will the person taking over the property start being responsible for its costs?": real_estate_start_date
     datatype: date
-    show if:
-      variable: real_estate_transfer
-      is: True
----
-id: Real Estate Custom Terms
-question: | 
-  Real Estate Custom terms
-fields:
-  - "We have additional terms to divide real estate": real_estate_custom_terms
+  - "Do you have custom terms for real estate?": real_estate_custom_terms
     datatype: yesno
-
-  - "Describe your real estate agreement": real_estate_custom_description
-    show if:
-      variable: real_estate_custom_terms
-      is: True
-
----
-id: Personal Property
-question: | 
-  Personal Property
-fields: 
-  - "Have you already divided all of your personal property?": personal_property_already_divided
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False
-
-  - "Do you have personal property left to divide?": personal_property_divide_plan
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False  
-    show if: 
-      variable: personal_property_already_divided
-      is: False 
-  - "How you will divide personal property?": personal_property_divide_description
-    datatype: text
-    show if: 
-      variable: personal_property_divide_plan
-      is: True
-  - "What date will you divide the property by?": personal_property_divide_date
+  - "Real estate custom description": real_estate_custom_description
+  - "Personal property already divided": personal_property_already_divided
+  - "Do you and your spouse have a plan for how to divide your personal property?": personal_property_divide_plan
+  - "Date of Personal property divide": personal_property_divide_date
     datatype: date
-    show if: 
-      variable: personal_property_divide_plan
-      is: True
+  - "What special terms have you and your spouse agreed to about real estate?": personal_property_divide_description
 ---
 id: Debts and Liabilities
 question: |
   Debts and Liabilities
 fields:
-  - "Do you have shared debts or liabilities from the marriage?": no_marital_debt
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False 
-  - "Do you agree on how to pay shared debts and liabilities?": debt_custom_terms
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False
-    show if: 
-      variable: no_marital_debt
-      is: True
-  - "What is your agreement for debts and liabilities?": debt_custom_description
-    show if: 
-      variable: debt_custom_terms
-      is: Yes
-  - "Will you each pay debts in our own name?": individual_debt_responsible_each
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False
-  - "Does Party A have debts or liabilities?": users[0].debt_listed
-    input type: radio
-    choices:
-      - Yes
-      - No   
-    show if: 
-      variable: individual_debt_responsible_each
-      is: False
+  - "Do you and your spouse agree that you have no shared debts from the marriage?": no_marital_debt
+    datatype: yesno
+  - "Will each of you be responsible for paying the debts that are in your own name?": individual_debt_responsible_each
+    datatype: yesno
+  - "Does Party A have any debts or liabilities they will be responsible for?": users[0].debt_listed
+    datatype: yesno
   - "What debts and liabilities will Party A be responsible for?": users[0].debt_description
-    show if: 
-      variable: users[0].debt_listed
-      is: True 
-  - "Does Party B have debts or liabilities?": other_parties[0].debt_listed
-    input type: button
-    choices: 
-      - Yes: True
-      - No: False
-    show if:
-      variable: individual_debt_responsible_each
-      is: No
+  - "Does Party B have any debts or liabilities?": other_parties[0].debt_listed
+    datatype: yesno
   - "If Party B has debts and liabilities, what are they?": other_parties[0].debt_description
-    show if: 
-      variable: other_parties[0].debt_listed
-      is: Yes
+  - "Do you have custom terms for debt?": debt_custom_terms
+    datatype: yesno
+  - "What is your agreement for debts and liabilities?": debt_custom_description
 ---
 id: Pension and Retirement Plans
 question: |
   Pension and Retirement Plans
 fields:
-  - "Do you either of you have retirement or pension benefits": no_retirement_benefits
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False
-  - "Are you waiving interest to each other's retirement or pension benefits?": retirement_interest_waived
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False
-    show if: 
-      variable: no_retirement_benefits
-      is: True
-  - "Are you dividing retirement or pension benefits?": retirement_benefits_divided
-    input type: radio
-    choices: 
-      - Yes: True
-      - No: False
-    show if:
-      variable: retirement_interest_waived
-      is: False 
+  - "The parties have no retirement or pension benefits to be divided": no_retirement_benefits
+    datatype: yesno
+  - "Have you and your spouse agreed to give up any right to each other’s retirement or pension benefits?": retirement_interest_waived
+    datatype: yesno
+  - "Have you and your spouse agreed to divide any retirement or pension benefits?": retirement_benefits_divided
+    datatype: yesno
   - "How will you and your spouse divide any retirement or pension benefits?": retirement_division_description
-    show if: 
-      variable: retirement_benefits_divided
-      is: True
 ---
 id: Life Insurance
 question: |
   Life Insurance
 fields:
-  - "We have no life insurance policies": no_life_insurance
+  - "Do you and your spouse currently have no life insurance policies?": no_life_insurance
     datatype: yesno
-  - "One of us will maintain life insurance for the other": life_insurance_custom_terms
+  - "Will Party A keep their current life insurance and name the children (or a trust for the children) as the beneficiaries?": users1_life_insurance_required
+    datatype: yesno
+  - "Will Party B shall maintain in full force and effect their present life insurance on their life, with the child(ren) of the parties, or a trust for the benefit of the child(ren) of the parties, as beneficiary?": other_parties1_life_insurance_required
+    datatype: yesno
+  - "Do you have custom terms for life insurance?": life_insurance_custom_terms
     datatype: yesno
   - "What special terms have you and your spouse agreed to about life insurance?": life_insurance_custom_description
-    show if: 
-      variable: life_insurance_custom_terms
-      is: True
----
-id: Children Life Insurance
-question: | 
-  Children Life Insurance
-fields:
-  - "Party A is keeping their current life insurance and naming the children as the beneficiaries": users1_life_insurance_required
-    datatype: yesno
-  - "Party B is keeping their current life insurance and naming the children as beneficiaries": other_parties1_life_insurance_required
-    datatype: yesno
 ---
 id: Merger Survival
 question: |
