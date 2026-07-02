@@ -1307,30 +1307,6 @@ fields:
 ---
 #################### Court info #####################
 
-id: trial court
-question: |
-  Which Probate and Family Court will you file in?
-subquestion: |
-  File in the Probate and Family Court in the county where either of you lives.
-fields:
-  - no label: trial_court
-    datatype: dropdown
-    choices:
-      - Barnstable Probate and Family Court
-      - Berkshire Probate and Family Court
-      - Bristol Probate and Family Court
-      - Dukes Probate and Family Court
-      - Essex Probate and Family Court
-      - Franklin Probate and Family Court
-      - Hampden Probate and Family Court
-      - Hampshire Probate and Family Court
-      - Middlesex Probate and Family Court
-      - Nantucket Probate and Family Court
-      - Norfolk Probate and Family Court
-      - Plymouth Probate and Family Court
-      - Suffolk Probate and Family Court
-      - Worcester Probate and Family Court
----
 id: court info
 question: |
   Court and agreement information
@@ -1524,7 +1500,7 @@ confirm: True
 ---
 #################### Intro #####################
 
-id: al_intro_screen
+id: separation agreement standalone intro
 question: |
   Massachusetts 1A Divorce Separation Agreement
 subquestion: |
@@ -1539,7 +1515,7 @@ subquestion: |
   * Alimony and health insurance
 
   [Learn more about 1A divorce](https://www.mass.gov/how-to/file-for-a-1a-divorce)
-continue button field: al_intro_screen
+continue button field: separation_agreement_intro_screen
 ---
 #################### Objects and attachments #####################
 
