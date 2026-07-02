@@ -1,6 +1,6 @@
 ---
 include:
-  - separation_agreement.yml
+  - a_divorce_agreement.yml
 ---
 code: |
   github_repo_name =  'docassemble-MATCSeparationAgreement'
@@ -14,6 +14,7 @@ code: |
 objects:
   - children: ALPeopleList.using(there_are_any=True)
   - users: ALPeopleList.using(ask_number=False, target_number=2)
+  - trial_court: MACourt
 ---
 code: |
   a_divorce_agreement_Post_interview_instructions.enabled = True
@@ -112,6 +113,10 @@ code: |
   al_intro_screen
   a_divorce_agreement_intro
   interview_order_a_divorce_agreement
+  a_divorce_agreement_preview_question
+  basic_questions_signature_flow
+  users[0].signature
+  users[1].signature
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(

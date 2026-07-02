@@ -1,6 +1,7 @@
 ---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALMassachusetts:al_massachusetts.yml
   - docassemble.MassAccess:massaccess.yml
 ---
 metadata:
@@ -66,10 +67,6 @@ code: |
 code: |
   AL_DEFAULT_STATE = "MA"
 ---
-objects:
-  - users: ALPeopleList.using(ask_number=False, target_number=2)
-  - children: ALPeopleList.using(ask_number=True)
----
 sections:
   - intro: Introduction
   - parties: Parties
@@ -93,12 +90,8 @@ sections:
 ---
 #################### Interview order #####################
 
-id: interview order
-mandatory: True
+id: interview_order_a_divorce_agreement
 code: |
-  nav.set_section("intro")
-  al_intro_screen
-
   nav.set_section("parties")
   users[0].name.first
   users[0].phone_number
@@ -265,11 +258,7 @@ code: |
   signature_date
   docket_number
 
-  a_divorce_agreement_preview_question
-  basic_questions_signature_flow
-  users[0].signature
-  users[1].signature
-  a_divorce_agreement_download
+  interview_order_a_divorce_agreement = True
 ---
 #################### Derived variables #####################
 
@@ -1556,15 +1545,13 @@ continue button field: al_intro_screen
 
 objects:
   - a_divorce_agreement_attachment: ALDocument.using(title="1A Divorce Separation Agreement", filename="a_divorce_agreement", has_addendum=False, enabled=True)
-  - a_divorce_agreement_instructions: ALDocument.using(title="Instructions", filename="a_divorce_agreement_next_steps", has_addendum=False, enabled=True)
-  - al_user_bundle: ALDocumentBundle.using(elements=[a_divorce_agreement_instructions, a_divorce_agreement_attachment], filename="separation_agreement_packet", title="All forms", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[a_divorce_agreement_attachment], filename="separation_agreement_court", title="Forms to deliver to court", enabled=True)
+  - a_divorce_agreement_Post_interview_instructions: ALDocument.using(title="Instructions", filename="a_divorce_agreement_next_steps", has_addendum=False, enabled=True)
 ---
 attachment:
   name: Instructions
   filename: a_divorce_agreement_next_steps
   docx template file: a_divorce_agreement_next_steps.docx
-  variable name: a_divorce_agreement_instructions[i]
+  variable name: a_divorce_agreement_Post_interview_instructions[i]
   skip undefined: True
   tagged pdf: True
 ---
