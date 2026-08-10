@@ -1355,6 +1355,9 @@ subquestion: |
   Thank you, ${ users[0] } and ${ users[1] }. Your separation agreement is
   ready to download.
 
+  **Before filing:** Both spouses must sign the agreement in front of a
+  notary. The signatures entered here do not replace notarization.
+
   ${ action_button_html(url_action('review_a_divorce_agreement'), label=':edit: Make changes', color='success', size='md') }
 
   ${ al_user_bundle.download_list_html() }
